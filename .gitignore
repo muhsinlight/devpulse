@@ -1,0 +1,106 @@
+# ==============================================================================
+# Laravel & PHP
+# ==============================================================================
+/vendor/
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
+/bootstrap/ssr/
+/storage/*.key
+/storage/pail/
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore
+/public/storage
+/public/hot
+auth.json
+
+# ==============================================================================
+# Environment & Secrets (Never commit credentials)
+# ==============================================================================
+.env
+.env.*
+!.env.example
+!.env.testing
+
+# ==============================================================================
+# Databases (Local SQLite / dumps)
+# ==============================================================================
+*.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+*.sql
+*.dump
+
+# ==============================================================================
+# Node, Package Managers & Frontend Build
+# ==============================================================================
+/node_modules/
+/public/build/
+/public/fonts-manifest.dev.json
+.vite/
+.turbo/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ==============================================================================
+# Laravel Wayfinder (Generated route & action TS files)
+# ==============================================================================
+/resources/js/actions/
+/resources/js/routes/
+/resources/js/wayfinder/
+
+# ==============================================================================
+# Testing, Coverage & Static Analysis
+# ==============================================================================
+/.phpunit.cache/
+.phpunit.result.cache
+/.pest/
+/coverage/
+.phpstan.cache/
+.phpactor.json
+
+# ==============================================================================
+# IDEs, Code Editors & Tooling
+# ==============================================================================
+/.idea/
+/.vscode/
+!.vscode/extensions.json
+/.fleet/
+/.nova/
+/.zed/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-project
+*.sublime-workspace
+Homestead.json
+Homestead.yaml
+
+# ==============================================================================
+# Operating System Artifacts (Windows / macOS / Linux)
+# ==============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Thumbs.db:encryptable
+desktop.ini
+$RECYCLE.BIN/
+*.tmp
+*.bak
