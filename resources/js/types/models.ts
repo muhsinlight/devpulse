@@ -32,6 +32,7 @@ export type Monitor = {
     last_response_time_ms: number | null;
     uptime_percentage: number;
     is_active: boolean;
+    next_check_at: string | null;
     created_at: string;
     updated_at: string;
     project?: Project;

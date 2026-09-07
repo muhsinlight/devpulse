@@ -4,6 +4,7 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import { Activity, LogOut } from 'lucide-vue-next';
 import { dashboard } from '@/routes';
 import { index as projectsIndex } from '@/routes/projects';
+import { index as monitorsIndex } from '@/routes/monitors';
 import { destroy as destroySession } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import type { Auth } from '@/types/auth';
 
@@ -15,6 +16,11 @@ const currentPath = computed(() => page.url.split('?')[0] ?? '/');
 
 const isOverview = computed(() => currentPath.value === '/dashboard');
 const isProjects = computed(() => currentPath.value.startsWith('/projects'));
+const isMonitors = computed(
+    () =>
+        currentPath.value === '/monitors' ||
+        /^\/monitors\/\d+/.test(currentPath.value),
+);
 
 const logout = () => {
     router.post(destroySession.url());
@@ -60,13 +66,15 @@ const logout = () => {
                     >
                         Projects
                     </Link>
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-ghost text-base-content/60 cursor-not-allowed"
-                        disabled
+                    <Link
+                        :href="monitorsIndex.url()"
+                        class="btn btn-sm btn-ghost"
+                        :class="
+                            isMonitors ? 'text-primary' : 'text-base-content/60'
+                        "
                     >
                         Monitors
-                    </button>
+                    </Link>
                     <button
                         type="button"
                         class="btn btn-sm btn-ghost text-base-content/60 cursor-not-allowed"

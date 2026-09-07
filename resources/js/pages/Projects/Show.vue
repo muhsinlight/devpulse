@@ -9,15 +9,21 @@ import {
     Webhook,
 } from 'lucide-vue-next';
 import AppLayout from '@/layouts/AppLayout.vue';
-import type { Project } from '@/types';
+import StatusBadge from '@/components/StatusBadge.vue';
+import type { Monitor, Project } from '@/types';
 import {
     destroy as destroyProject,
     edit as editProject,
     index as projectsIndex,
 } from '@/actions/App/Http/Controllers/ProjectController';
+import {
+    create as createMonitor,
+    show as showMonitor,
+} from '@/actions/App/Http/Controllers/MonitorController';
 
 const props = defineProps<{
     project: Project;
+    monitors: Monitor[];
 }>();
 
 const deleteProject = () => {
@@ -107,30 +113,57 @@ const deleteProject = () => {
                             <div>
                                 <h2 class="text-sm font-semibold">Monitors</h2>
                                 <p class="text-base-content/50 text-[11px]">
-                                    {{ project.monitors_count ?? 0 }} configured
+                                    {{
+                                        project.monitors_count ??
+                                        monitors.length
+                                    }}
+                                    configured
                                 </p>
                             </div>
                         </div>
-                        <button
-                            type="button"
-                            class="btn btn-ghost btn-xs cursor-not-allowed gap-1 opacity-60"
-                            disabled
+                        <Link
+                            :href="createMonitor.url(project.id)"
+                            class="btn btn-ghost btn-xs gap-1"
                         >
                             <Plus class="h-3 w-3" />
                             Add
-                        </button>
+                        </Link>
                     </div>
+
                     <div
+                        v-if="monitors.length === 0"
                         class="border-base-300/80 bg-base-200/40 rounded-lg border border-dashed px-4 py-8 text-center"
                     >
                         <p class="text-base-content/70 text-xs font-medium">
-                            API monitoring comes in Phase 3
+                            No monitors on this project yet
                         </p>
                         <p class="text-base-content/50 mt-1 text-[11px]">
-                            You'll be able to ping endpoints on a schedule from
-                            here.
+                            Add an endpoint to run manual health checks.
                         </p>
                     </div>
+
+                    <ul v-else class="divide-base-300/60 divide-y">
+                        <li
+                            v-for="monitor in monitors"
+                            :key="monitor.id"
+                            class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                        >
+                            <div class="min-w-0">
+                                <Link
+                                    :href="showMonitor.url(monitor.id)"
+                                    class="hover:text-primary truncate text-sm font-medium"
+                                >
+                                    {{ monitor.name }}
+                                </Link>
+                                <p
+                                    class="text-base-content/50 truncate font-mono text-[11px]"
+                                >
+                                    {{ monitor.method }} {{ monitor.url }}
+                                </p>
+                            </div>
+                            <StatusBadge :status="monitor.status" size="xs" />
+                        </li>
+                    </ul>
                 </div>
 
                 <div

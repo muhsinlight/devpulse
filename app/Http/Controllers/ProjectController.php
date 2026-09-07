@@ -22,13 +22,15 @@ class ProjectController extends Controller
 
         $projects = $request->user()
             ->projects()
+            ->withCount([
+                'monitors',
+                'monitors as active_monitors_count' => fn ($query) => $query->where('is_active', true),
+            ])
             ->latest()
             ->get()
             ->map(fn (Project $project): array => [
                 ...$project->toArray(),
-                'monitors_count' => 0,
                 'webhooks_count' => 0,
-                'active_monitors_count' => 0,
             ]);
 
         return Inertia::render('Projects/Index', [
@@ -63,13 +65,21 @@ class ProjectController extends Controller
     {
         Gate::authorize('view', $project);
 
+        $project->loadCount([
+            'monitors',
+            'monitors as active_monitors_count' => fn ($query) => $query->where('is_active', true),
+        ]);
+
+        $monitors = $project->monitors()
+            ->latest()
+            ->get();
+
         return Inertia::render('Projects/Show', [
             'project' => [
                 ...$project->toArray(),
-                'monitors_count' => 0,
                 'webhooks_count' => 0,
-                'active_monitors_count' => 0,
             ],
+            'monitors' => $monitors,
         ]);
     }
 

@@ -12,6 +12,7 @@ import {
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { Auth } from '@/types/auth';
 import { create as createProject } from '@/actions/App/Http/Controllers/ProjectController';
+import { index as monitorsIndex } from '@/actions/App/Http/Controllers/MonitorController';
 
 const page = usePage();
 const user = (page.props.auth as Auth).user;
@@ -40,14 +41,13 @@ const user = (page.props.auth as Auth).user;
                     <Plus class="h-4 w-4" />
                     Create Project
                 </Link>
-                <button
-                    type="button"
-                    class="btn btn-outline btn-sm cursor-not-allowed gap-1.5 opacity-60"
-                    disabled
+                <Link
+                    :href="monitorsIndex.url()"
+                    class="btn btn-outline btn-sm gap-1.5"
                 >
                     <Radio class="h-4 w-4 text-emerald-500" />
                     New Monitor
-                </button>
+                </Link>
             </div>
         </div>
 

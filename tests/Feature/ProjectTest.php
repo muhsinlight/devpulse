@@ -87,7 +87,8 @@ test('users can view their own project', function () {
         ->assertInertia(fn ($page) => $page
             ->component('Projects/Show')
             ->where('project.id', $project->id)
-            ->where('project.name', $project->name));
+            ->where('project.name', $project->name)
+            ->has('monitors'));
 });
 
 test('users cannot view another users project', function () {
