@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "Running composer ci:check before push..."
+composer ci:check

@@ -67,6 +67,9 @@
             "npm run types:check",
             "@test"
         ],
+        "hooks:install": [
+            "git config core.hooksPath .githooks"
+        ],
         "types:check": [
             "phpstan analyse"
         ],

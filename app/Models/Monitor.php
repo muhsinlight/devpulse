@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\HttpMethod;
 use App\Enums\MonitorStatus;
+use Carbon\CarbonImmutable;
 use Database\Factories\MonitorFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -13,7 +14,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -27,14 +27,14 @@ use Illuminate\Support\Carbon;
  * @property int $expected_status_code
  * @property int $timeout_seconds
  * @property MonitorStatus $status
- * @property Carbon|null $last_checked_at
+ * @property CarbonImmutable|null $last_checked_at
  * @property int|null $last_status_code
  * @property int|null $last_response_time_ms
  * @property string $uptime_percentage
  * @property bool $is_active
- * @property Carbon|null $next_check_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonImmutable|null $next_check_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  * @property-read Project $project
  * @property-read Collection<int, MonitorResult> $results
  */

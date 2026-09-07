@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Enums\HttpMethod;
 use App\Enums\MonitorStatus;
 use App\Models\Monitor;
 use App\Models\MonitorResult;
@@ -24,14 +25,13 @@ class CheckMonitorAction
                 ->withHeaders($monitor->headers ?? [])
                 ->withOptions(['http_errors' => false]);
 
-            $response = match ($monitor->method->value) {
-                'GET' => $pending->get($monitor->url),
-                'POST' => $pending->withBody($monitor->body ?? '', 'application/json')->post($monitor->url),
-                'PUT' => $pending->withBody($monitor->body ?? '', 'application/json')->put($monitor->url),
-                'PATCH' => $pending->withBody($monitor->body ?? '', 'application/json')->patch($monitor->url),
-                'DELETE' => $pending->withBody($monitor->body ?? '', 'application/json')->delete($monitor->url),
-                'HEAD' => $pending->head($monitor->url),
-                default => $pending->get($monitor->url),
+            $response = match ($monitor->method) {
+                HttpMethod::Get => $pending->get($monitor->url),
+                HttpMethod::Post => $pending->withBody($monitor->body ?? '', 'application/json')->post($monitor->url),
+                HttpMethod::Put => $pending->withBody($monitor->body ?? '', 'application/json')->put($monitor->url),
+                HttpMethod::Patch => $pending->withBody($monitor->body ?? '', 'application/json')->patch($monitor->url),
+                HttpMethod::Delete => $pending->withBody($monitor->body ?? '', 'application/json')->delete($monitor->url),
+                HttpMethod::Head => $pending->head($monitor->url),
             };
 
             $statusCode = $response->status();
@@ -43,7 +43,7 @@ class CheckMonitorAction
         } catch (ConnectionException $exception) {
             $errorMessage = $exception->getMessage();
         } catch (RequestException $exception) {
-            $statusCode = $exception->response?->status();
+            $statusCode = $exception->response->status();
             $errorMessage = $exception->getMessage();
         } catch (Throwable $exception) {
             $errorMessage = $exception->getMessage();

@@ -7,6 +7,7 @@ use App\Enums\MonitorStatus;
 use App\Models\Monitor;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 
 /**
  * @extends Factory<Monitor>
@@ -22,7 +23,7 @@ class MonitorFactory extends Factory
     {
         return [
             'project_id' => Project::factory(),
-            'name' => fake()->words(3, true).' Health',
+            'name' => implode(' ', Arr::wrap(fake()->words(3))).' Health',
             'url' => fake()->url(),
             'method' => HttpMethod::Get,
             'headers' => null,
