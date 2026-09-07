@@ -167,9 +167,7 @@ const deleteMonitor = () => {
                         <template v-if="!monitor.is_active">Paused</template>
                         <template v-else-if="monitor.next_check_at">
                             {{
-                                new Date(
-                                    monitor.next_check_at,
-                                ).toLocaleString()
+                                new Date(monitor.next_check_at).toLocaleString()
                             }}
                         </template>
                         <template v-else>—</template>
@@ -183,7 +181,9 @@ const deleteMonitor = () => {
                     <p class="text-base-content/50 text-[11px]">
                         Latest 50 results · scheduled every
                         {{ monitor.check_interval }}
-                        {{ monitor.check_interval === 1 ? 'minute' : 'minutes' }}
+                        {{
+                            monitor.check_interval === 1 ? 'minute' : 'minutes'
+                        }}
                     </p>
                 </div>
 
