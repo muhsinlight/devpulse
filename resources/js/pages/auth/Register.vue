@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { Eye, EyeOff, Lock, Mail, User, ArrowRight } from 'lucide-vue-next';
+import { Eye, EyeOff, Lock, Mail, User } from 'lucide-vue-next';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import InputError from '@/components/InputError.vue';
 import TextInput from '@/components/TextInput.vue';
@@ -29,8 +29,8 @@ const submit = () => {
 
 <template>
     <AuthLayout
-        title="Create DevPulse Account"
-        subtitle="Start monitoring your APIs and Webhooks in real-time"
+        title="Create account"
+        subtitle="Monitor APIs and capture webhooks"
     >
         <Head title="Sign Up" />
 
@@ -159,10 +159,7 @@ const submit = () => {
             <!-- Submit Button -->
             <div class="pt-2">
                 <PrimaryButton :loading="form.processing">
-                    <span class="flex items-center justify-center gap-2">
-                        Get Started Free
-                        <ArrowRight class="h-4 w-4" />
-                    </span>
+                    Create account
                 </PrimaryButton>
             </div>
 

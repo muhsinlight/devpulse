@@ -28,7 +28,7 @@ defineProps<{
             </div>
             <Link
                 :href="createProject.url()"
-                class="btn btn-primary btn-sm shadow-primary/20 gap-1.5 shadow-sm"
+                class="btn btn-primary btn-sm gap-1.5"
             >
                 <Plus class="h-4 w-4" />
                 Create Project
@@ -41,9 +41,9 @@ defineProps<{
         >
             <div class="mx-auto max-w-md space-y-4 text-center">
                 <div
-                    class="bg-primary/10 text-primary ring-primary/5 mx-auto flex h-14 w-14 items-center justify-center rounded-2xl ring-8"
+                    class="bg-base-200 text-base-content/70 mx-auto flex h-10 w-10 items-center justify-center rounded"
                 >
-                    <FolderKanban class="h-7 w-7" />
+                    <FolderKanban class="h-5 w-5" />
                 </div>
                 <div>
                     <h2 class="text-xl font-bold">No projects yet</h2>

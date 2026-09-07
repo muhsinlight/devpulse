@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { Eye, EyeOff, Lock, Mail, ArrowRight } from 'lucide-vue-next';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-vue-next';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import InputError from '@/components/InputError.vue';
 import TextInput from '@/components/TextInput.vue';
@@ -148,10 +148,7 @@ const submit = () => {
             <!-- Submit Button -->
             <div class="pt-2">
                 <PrimaryButton :loading="form.processing">
-                    <span class="flex items-center justify-center gap-2">
-                        Sign In to DevPulse
-                        <ArrowRight class="h-4 w-4" />
-                    </span>
+                    Sign in
                 </PrimaryButton>
             </div>
 
