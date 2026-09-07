@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { Activity, ShieldCheck, Zap } from 'lucide-vue-next';
+import { home } from '@/routes';
 
 defineProps<{
     title?: string;
@@ -23,7 +24,10 @@ defineProps<{
         <div class="relative z-10 w-full max-w-md">
             <!-- Brand Logo -->
             <div class="mb-8 text-center">
-                <Link href="/" class="group inline-flex items-center gap-2.5">
+                <Link
+                    :href="home.url()"
+                    class="group inline-flex items-center gap-2.5"
+                >
                     <div
                         class="from-primary text-primary-content shadow-primary/25 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr to-emerald-400 shadow-lg transition-transform duration-200 group-hover:scale-105"
                     >

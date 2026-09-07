@@ -9,6 +9,7 @@ import {
     Webhook,
     Zap,
 } from 'lucide-vue-next';
+import { dashboard, home, login, register } from '@/routes';
 
 interface Auth {
     user: {
@@ -41,7 +42,10 @@ defineProps<{
         <header
             class="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-8"
         >
-            <Link href="/" class="group inline-flex items-center gap-2.5">
+            <Link
+                :href="home.url()"
+                class="group inline-flex items-center gap-2.5"
+            >
                 <div
                     class="from-primary shadow-primary/20 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr to-emerald-400 text-white shadow-lg transition-transform duration-200 group-hover:scale-105"
                 >
@@ -65,7 +69,7 @@ defineProps<{
             <nav class="flex items-center gap-3">
                 <template v-if="auth?.user">
                     <Link
-                        href="/dashboard"
+                        :href="dashboard.url()"
                         class="btn btn-primary btn-sm shadow-primary/20 gap-2 shadow-sm"
                     >
                         <span>Go to Dashboard</span>
@@ -74,13 +78,13 @@ defineProps<{
                 </template>
                 <template v-else>
                     <Link
-                        href="/login"
+                        :href="login.url()"
                         class="btn btn-ghost btn-sm text-xs font-semibold"
                     >
                         Sign In
                     </Link>
                     <Link
-                        href="/register"
+                        :href="register.url()"
                         class="btn btn-primary btn-sm shadow-primary/20 gap-1.5 text-xs font-semibold shadow-sm"
                     >
                         <span>Get Started Free</span>
@@ -128,7 +132,7 @@ defineProps<{
             >
                 <template v-if="auth?.user">
                     <Link
-                        href="/dashboard"
+                        :href="dashboard.url()"
                         class="btn btn-primary btn-md shadow-primary/25 w-full gap-2 text-sm shadow-lg sm:w-auto"
                     >
                         <span>Open Dashboard</span>
@@ -137,14 +141,14 @@ defineProps<{
                 </template>
                 <template v-else>
                     <Link
-                        href="/register"
+                        :href="register.url()"
                         class="btn btn-primary btn-md shadow-primary/25 w-full gap-2 text-sm shadow-lg sm:w-auto"
                     >
                         <span>Start Monitoring Now</span>
                         <ArrowRight class="h-4 w-4" />
                     </Link>
                     <Link
-                        href="/login"
+                        :href="login.url()"
                         class="btn btn-outline btn-md w-full text-sm sm:w-auto"
                     >
                         Sign in to account

@@ -6,6 +6,8 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import InputError from '@/components/InputError.vue';
 import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
+import { login } from '@/routes';
+import { store as storeRegistration } from '@/actions/App/Http/Controllers/Auth/RegisteredUserController';
 
 const showPassword = ref(false);
 
@@ -17,7 +19,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post('/register', {
+    form.post(storeRegistration.url(), {
         onFinish: () => {
             form.reset('password', 'password_confirmation');
         },
@@ -169,7 +171,7 @@ const submit = () => {
                 <p class="text-base-content/60 text-xs">
                     Already have an account?
                     <Link
-                        href="/login"
+                        :href="login.url()"
                         class="text-primary ml-1 font-semibold hover:underline"
                     >
                         Sign in

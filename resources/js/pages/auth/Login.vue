@@ -6,6 +6,9 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import InputError from '@/components/InputError.vue';
 import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
+import { register } from '@/routes';
+import { request as passwordRequest } from '@/routes/password';
+import { store as storeLogin } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 
 defineProps<{
     canResetPassword?: boolean;
@@ -21,7 +24,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post('/login', {
+    form.post(storeLogin.url(), {
         onFinish: () => {
             form.reset('password');
         },
@@ -94,7 +97,7 @@ const submit = () => {
                     </label>
                     <Link
                         v-if="canResetPassword"
-                        href="/forgot-password"
+                        :href="passwordRequest.url()"
                         class="text-primary text-xs font-medium hover:underline"
                     >
                         Forgot password?
@@ -157,7 +160,7 @@ const submit = () => {
                 <p class="text-base-content/60 text-xs">
                     Don't have an account yet?
                     <Link
-                        href="/register"
+                        :href="register.url()"
                         class="text-primary ml-1 font-semibold hover:underline"
                     >
                         Create an account

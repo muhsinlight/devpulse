@@ -5,6 +5,8 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import InputError from '@/components/InputError.vue';
 import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
+import { login } from '@/routes';
+import { store as storePasswordEmail } from '@/actions/App/Http/Controllers/Auth/PasswordResetLinkController';
 
 defineProps<{
     status?: string;
@@ -15,7 +17,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post('/forgot-password');
+    form.post(storePasswordEmail.url());
 };
 </script>
 
@@ -86,7 +88,7 @@ const submit = () => {
             <!-- Back to Login -->
             <div class="border-base-200 border-t pt-3 text-center">
                 <Link
-                    href="/login"
+                    :href="login.url()"
                     class="text-base-content/70 hover:text-primary inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"
                 >
                     <ArrowLeft class="h-3.5 w-3.5" />
