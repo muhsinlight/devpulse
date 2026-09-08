@@ -54,8 +54,10 @@ export type WebhookEndpoint = {
     project_id: number;
     name: string;
     token: string;
-    secret: string | null;
+    ingest_url?: string;
     is_active: boolean;
+    hmac_required: boolean;
+    hmac_secret?: string | null;
     requests_count?: number;
     last_received_at: string | null;
     created_at: string;
@@ -67,6 +69,9 @@ export type WebhookRequest = {
     id: number;
     webhook_endpoint_id: number;
     ip_address: string | null;
+    ip_iso_code?: string | null;
+    ip_country?: string | null;
+    ip_city?: string | null;
     method: string;
     headers: Record<string, string[] | string>;
     query_params: Record<string, unknown> | null;

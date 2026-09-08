@@ -11,3 +11,7 @@ Artisan::command('inspire', function () {
 Schedule::command('monitors:dispatch-due')
     ->everyMinute()
     ->withoutOverlapping();
+
+Schedule::command('webhooks:prune-requests')
+    ->daily()
+    ->withoutOverlapping();

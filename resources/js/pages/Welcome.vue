@@ -104,7 +104,9 @@ defineProps<{
                         <Inbox
                             class="text-base-content/40 mt-0.5 h-4 w-4 shrink-0"
                         />
-                        <span>Webhook inbox coming next</span>
+                        <span
+                            >Inbound webhook inbox with unique ingest URLs</span
+                        >
                     </li>
                 </ul>
             </div>

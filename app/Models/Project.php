@@ -23,6 +23,7 @@ use Illuminate\Support\Str;
  * @property Carbon|null $updated_at
  * @property-read User $user
  * @property-read Collection<int, Monitor> $monitors
+ * @property-read Collection<int, WebhookEndpoint> $webhooks
  */
 #[Fillable(['name', 'slug', 'description', 'color'])]
 class Project extends Model
@@ -67,6 +68,14 @@ class Project extends Model
     public function monitors(): HasMany
     {
         return $this->hasMany(Monitor::class);
+    }
+
+    /**
+     * @return HasMany<WebhookEndpoint, $this>
+     */
+    public function webhooks(): HasMany
+    {
+        return $this->hasMany(WebhookEndpoint::class);
     }
 
     public static function generateUniqueSlug(string $name, int $userId, ?int $ignoreId = null): string

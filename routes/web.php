@@ -3,9 +3,13 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\WebhookEndpointController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
+
+Route::any('hooks/{token}', [WebhookEndpointController::class, 'ingest'])
+    ->name('webhooks.ingest');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
@@ -26,6 +30,16 @@ Route::middleware(['auth'])->group(function () {
     Route::put('monitors/{monitor}', [MonitorController::class, 'update'])->name('monitors.update');
     Route::delete('monitors/{monitor}', [MonitorController::class, 'destroy'])->name('monitors.destroy');
     Route::post('monitors/{monitor}/check', [MonitorController::class, 'check'])->name('monitors.check');
+
+    Route::get('webhooks', [WebhookEndpointController::class, 'index'])->name('webhooks.index');
+    Route::get('projects/{project}/webhooks/create', [WebhookEndpointController::class, 'create'])->name('webhooks.create');
+    Route::post('projects/{project}/webhooks', [WebhookEndpointController::class, 'store'])->name('webhooks.store');
+    Route::get('webhooks/{webhookEndpoint}', [WebhookEndpointController::class, 'show'])->name('webhooks.show');
+    Route::get('webhooks/{webhookEndpoint}/edit', [WebhookEndpointController::class, 'edit'])->name('webhooks.edit');
+    Route::put('webhooks/{webhookEndpoint}', [WebhookEndpointController::class, 'update'])->name('webhooks.update');
+    Route::delete('webhooks/{webhookEndpoint}', [WebhookEndpointController::class, 'destroy'])->name('webhooks.destroy');
+    Route::post('webhooks/{webhookEndpoint}/rotate', [WebhookEndpointController::class, 'rotate'])->name('webhooks.rotate');
+    Route::post('webhooks/{webhookEndpoint}/rotate-hmac', [WebhookEndpointController::class, 'rotateHmac'])->name('webhooks.rotate-hmac');
 });
 
 require __DIR__.'/auth.php';

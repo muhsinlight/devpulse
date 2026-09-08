@@ -2,7 +2,12 @@
     "$schema": "https://www.schemastore.org/package.json",
     "private": true,
     "type": "module",
+    "packageManager": "pnpm@12.0.0",
+    "engines": {
+        "pnpm": ">=12.0.0"
+    },
     "scripts": {
+        "preinstall": "npx only-allow pnpm",
         "build": "vp build",
         "build:ssr": "vp build && vp build --ssr",
         "dev": "vp dev",
@@ -16,8 +21,9 @@
         "@tailwindcss/vite": "^4.1.11",
         "@vitejs/plugin-vue": "^6.0.0",
         "clsx": "^2.1.1",
-        "concurrently": "^10.0.3",
+        "laravel-echo": "^2.4.0",
         "laravel-vite-plugin": "^3.1",
+        "pusher-js": "^8.6.0",
         "tailwind-merge": "^3.2.0",
         "tailwindcss": "^4.1.1",
         "typescript": "^5.2.2",

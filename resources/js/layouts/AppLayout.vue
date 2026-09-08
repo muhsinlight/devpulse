@@ -7,6 +7,7 @@ import ThemeToggle from '@/components/ThemeToggle.vue';
 import { dashboard } from '@/routes';
 import { index as projectsIndex } from '@/routes/projects';
 import { index as monitorsIndex } from '@/routes/monitors';
+import { index as webhooksIndex } from '@/routes/webhooks';
 import { destroy as destroySession } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import type { Auth } from '@/types/auth';
 
@@ -22,6 +23,11 @@ const isMonitors = computed(
     () =>
         currentPath.value === '/monitors' ||
         /^\/monitors\/\d+/.test(currentPath.value),
+);
+const isWebhooks = computed(
+    () =>
+        currentPath.value === '/webhooks' ||
+        /^\/webhooks\/\d+/.test(currentPath.value),
 );
 
 const logout = () => {
@@ -61,13 +67,12 @@ const navClass = (active: boolean) =>
                     >
                         Monitors
                     </Link>
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-ghost text-base-content/40 cursor-not-allowed"
-                        disabled
+                    <Link
+                        :href="webhooksIndex.url()"
+                        :class="navClass(isWebhooks)"
                     >
                         Webhooks
-                    </button>
+                    </Link>
                 </div>
             </div>
 

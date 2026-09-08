@@ -25,13 +25,10 @@ class ProjectController extends Controller
             ->withCount([
                 'monitors',
                 'monitors as active_monitors_count' => fn ($query) => $query->where('is_active', true),
+                'webhooks',
             ])
             ->latest()
-            ->get()
-            ->map(fn (Project $project): array => [
-                ...$project->toArray(),
-                'webhooks_count' => 0,
-            ]);
+            ->get();
 
         return Inertia::render('Projects/Index', [
             'projects' => $projects,
@@ -68,18 +65,22 @@ class ProjectController extends Controller
         $project->loadCount([
             'monitors',
             'monitors as active_monitors_count' => fn ($query) => $query->where('is_active', true),
+            'webhooks',
         ]);
 
         $monitors = $project->monitors()
             ->latest()
             ->get();
 
+        $webhooks = $project->webhooks()
+            ->withCount('requests')
+            ->latest()
+            ->get();
+
         return Inertia::render('Projects/Show', [
-            'project' => [
-                ...$project->toArray(),
-                'webhooks_count' => 0,
-            ],
+            'project' => $project,
             'monitors' => $monitors,
+            'webhooks' => $webhooks,
         ]);
     }
 

@@ -88,7 +88,8 @@ test('users can view their own project', function () {
             ->component('Projects/Show')
             ->where('project.id', $project->id)
             ->where('project.name', $project->name)
-            ->has('monitors'));
+            ->has('monitors')
+            ->has('webhooks'));
 });
 
 test('users cannot view another users project', function () {

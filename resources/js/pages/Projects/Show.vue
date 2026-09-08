@@ -10,7 +10,7 @@ import {
 } from 'lucide-vue-next';
 import AppLayout from '@/layouts/AppLayout.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
-import type { Monitor, Project } from '@/types';
+import type { Monitor, Project, WebhookEndpoint } from '@/types';
 import {
     destroy as destroyProject,
     edit as editProject,
@@ -20,10 +20,15 @@ import {
     create as createMonitor,
     show as showMonitor,
 } from '@/actions/App/Http/Controllers/MonitorController';
+import {
+    create as createWebhook,
+    show as showWebhook,
+} from '@/actions/App/Http/Controllers/WebhookEndpointController';
 
 const props = defineProps<{
     project: Project;
     monitors: Monitor[];
+    webhooks: WebhookEndpoint[];
 }>();
 
 const deleteProject = () => {
@@ -183,25 +188,57 @@ const deleteProject = () => {
                                 </p>
                             </div>
                         </div>
-                        <button
-                            type="button"
-                            class="btn btn-ghost btn-xs cursor-not-allowed gap-1 opacity-60"
-                            disabled
+                        <Link
+                            :href="createWebhook.url(project.id)"
+                            class="btn btn-ghost btn-xs gap-1"
                         >
                             <Plus class="h-3 w-3" />
                             Add
-                        </button>
+                        </Link>
                     </div>
                     <div
+                        v-if="webhooks.length === 0"
                         class="border-base-300/80 bg-base-200/40 rounded-lg border border-dashed px-4 py-8 text-center"
                     >
                         <p class="text-base-content/70 text-xs font-medium">
-                            Webhook inbox comes in Phase 5
+                            No webhook endpoints yet
                         </p>
                         <p class="text-base-content/50 mt-1 text-[11px]">
-                            Unique URLs and live request capture will land here.
+                            Create an ingest URL and POST to it to capture
+                            requests.
                         </p>
                     </div>
+                    <ul v-else class="divide-base-300/60 divide-y">
+                        <li
+                            v-for="webhook in webhooks"
+                            :key="webhook.id"
+                            class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                        >
+                            <div class="min-w-0">
+                                <Link
+                                    :href="showWebhook.url(webhook.id)"
+                                    class="hover:text-primary truncate text-sm font-medium"
+                                >
+                                    {{ webhook.name }}
+                                </Link>
+                                <p
+                                    class="text-base-content/50 truncate font-mono text-[11px]"
+                                >
+                                    {{ webhook.requests_count ?? 0 }} requests
+                                </p>
+                            </div>
+                            <span
+                                class="badge badge-xs"
+                                :class="
+                                    webhook.is_active
+                                        ? 'badge-success'
+                                        : 'badge-ghost'
+                                "
+                            >
+                                {{ webhook.is_active ? 'Active' : 'Paused' }}
+                            </span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
