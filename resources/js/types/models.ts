@@ -87,8 +87,11 @@ export type DashboardStats = {
     online_monitors: number;
     offline_monitors: number;
     degraded_monitors: number;
-    average_uptime: number;
+    pending_monitors: number;
+    average_uptime: number | null;
+    average_response_time_ms: number | null;
     total_webhook_requests_today: number;
+    open_incidents: number;
 };
 
 export type IncidentStatus = 'open' | 'resolved';
