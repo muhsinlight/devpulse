@@ -4,8 +4,9 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, Pencil, Play, Trash2 } from 'lucide-vue-next';
 import AppLayout from '@/layouts/AppLayout.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
-import type { Monitor, MonitorResult, Project } from '@/types';
+import type { Incident, Monitor, MonitorResult, Project } from '@/types';
 import { show as showProject } from '@/actions/App/Http/Controllers/ProjectController';
+import { show as showIncident } from '@/actions/App/Http/Controllers/IncidentController';
 import {
     check as checkMonitor,
     destroy as destroyMonitor,
@@ -18,6 +19,8 @@ const props = defineProps<{
         project?: Pick<Project, 'id' | 'name' | 'color' | 'slug'>;
     };
     results: MonitorResult[];
+    openIncident: Incident | null;
+    incidents: Incident[];
 }>();
 
 const page = usePage();
@@ -115,6 +118,29 @@ const deleteMonitor = () => {
                 {{ flashSuccess }}
             </div>
 
+            <div
+                v-if="openIncident"
+                class="alert alert-error text-sm"
+            >
+                <div>
+                    <p class="font-medium">Open incident</p>
+                    <p class="mt-0.5 text-xs opacity-80">
+                        Started
+                        {{
+                            new Date(openIncident.opened_at).toLocaleString()
+                        }}
+                        ·
+                        {{ openIncident.last_error_message ?? 'Check failed' }}
+                    </p>
+                </div>
+                <Link
+                    :href="showIncident.url(openIncident.id)"
+                    class="btn btn-sm"
+                >
+                    View incident
+                </Link>
+            </div>
+
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div
                     class="card bg-base-100 border-base-300/80 border p-4 shadow-sm"
@@ -172,6 +198,67 @@ const deleteMonitor = () => {
                         </template>
                         <template v-else>—</template>
                     </p>
+                </div>
+            </div>
+
+            <div
+                v-if="incidents.length > 0"
+                class="card bg-base-100 border-base-300/80 border shadow-sm"
+            >
+                <div class="border-base-300/80 border-b px-4 py-3">
+                    <h2 class="text-sm font-semibold">Incidents</h2>
+                    <p class="text-base-content/50 text-[11px]">
+                        Latest 10 downtime events for this monitor
+                    </p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="table">
+                        <thead>
+                            <tr class="text-base-content/60 text-xs uppercase">
+                                <th>Opened</th>
+                                <th>Status</th>
+                                <th>Resolved</th>
+                                <th>Error</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="incident in incidents"
+                                :key="incident.id"
+                            >
+                                <td class="font-mono text-xs">
+                                    <Link
+                                        :href="showIncident.url(incident.id)"
+                                        class="hover:text-primary"
+                                    >
+                                        {{
+                                            new Date(
+                                                incident.opened_at,
+                                            ).toLocaleString()
+                                        }}
+                                    </Link>
+                                </td>
+                                <td>
+                                    <StatusBadge :status="incident.status" />
+                                </td>
+                                <td class="font-mono text-xs">
+                                    <template v-if="incident.resolved_at">
+                                        {{
+                                            new Date(
+                                                incident.resolved_at,
+                                            ).toLocaleString()
+                                        }}
+                                    </template>
+                                    <template v-else>—</template>
+                                </td>
+                                <td
+                                    class="text-base-content/60 max-w-xs truncate text-xs"
+                                >
+                                    {{ incident.last_error_message ?? '—' }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 

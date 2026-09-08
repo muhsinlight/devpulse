@@ -77,9 +77,21 @@ class MonitorController extends Controller
             ->limit(50)
             ->get();
 
+        $openIncident = $monitor->incidents()
+            ->open()
+            ->latest('opened_at')
+            ->first();
+
+        $incidents = $monitor->incidents()
+            ->latest('opened_at')
+            ->limit(10)
+            ->get();
+
         return Inertia::render('Monitors/Show', [
             'monitor' => $monitor,
             'results' => $results,
+            'openIncident' => $openIncident,
+            'incidents' => $incidents,
         ]);
     }
 

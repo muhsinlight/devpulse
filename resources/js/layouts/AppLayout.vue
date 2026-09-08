@@ -8,6 +8,7 @@ import { dashboard } from '@/routes';
 import { index as projectsIndex } from '@/routes/projects';
 import { index as monitorsIndex } from '@/routes/monitors';
 import { index as webhooksIndex } from '@/routes/webhooks';
+import { index as incidentsIndex } from '@/routes/incidents';
 import { destroy as destroySession } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import type { Auth } from '@/types/auth';
 
@@ -28,6 +29,11 @@ const isWebhooks = computed(
     () =>
         currentPath.value === '/webhooks' ||
         /^\/webhooks\/\d+/.test(currentPath.value),
+);
+const isIncidents = computed(
+    () =>
+        currentPath.value === '/incidents' ||
+        /^\/incidents\/\d+/.test(currentPath.value),
 );
 
 const logout = () => {
@@ -72,6 +78,12 @@ const navClass = (active: boolean) =>
                         :class="navClass(isWebhooks)"
                     >
                         Webhooks
+                    </Link>
+                    <Link
+                        :href="incidentsIndex.url()"
+                        :class="navClass(isIncidents)"
+                    >
+                        Incidents
                     </Link>
                 </div>
             </div>

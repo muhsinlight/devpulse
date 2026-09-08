@@ -37,6 +37,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $updated_at
  * @property-read Project $project
  * @property-read Collection<int, MonitorResult> $results
+ * @property-read Collection<int, Incident> $incidents
  */
 #[Fillable([
     'name',
@@ -95,6 +96,14 @@ class Monitor extends Model
     public function results(): HasMany
     {
         return $this->hasMany(MonitorResult::class);
+    }
+
+    /**
+     * @return HasMany<Incident, $this>
+     */
+    public function incidents(): HasMany
+    {
+        return $this->hasMany(Incident::class);
     }
 
     /**

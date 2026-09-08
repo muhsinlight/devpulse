@@ -4,7 +4,7 @@ import { computed } from 'vue';
 
 const props = withDefaults(
     defineProps<{
-        status: MonitorStatus | 'success' | 'failed' | 'active' | 'inactive';
+        status: MonitorStatus | 'success' | 'failed' | 'active' | 'inactive' | 'open' | 'resolved';
         size?: 'xs' | 'sm' | 'md' | 'lg';
         showDot?: boolean;
     }>(),
@@ -19,9 +19,11 @@ const badgeClass = computed(() => {
         case 'online':
         case 'success':
         case 'active':
+        case 'resolved':
             return 'badge-success text-success-content';
         case 'offline':
         case 'failed':
+        case 'open':
             return 'badge-error text-error-content';
         case 'degraded':
             return 'badge-warning text-warning-content';
@@ -37,9 +39,11 @@ const dotClass = computed(() => {
         case 'online':
         case 'success':
         case 'active':
+        case 'resolved':
             return 'bg-emerald-400 animate-pulse';
         case 'offline':
         case 'failed':
+        case 'open':
             return 'bg-rose-400 animate-ping';
         case 'degraded':
             return 'bg-amber-400 animate-pulse';
@@ -66,6 +70,10 @@ const label = computed(() => {
             return '200 OK';
         case 'failed':
             return 'Failed';
+        case 'open':
+            return 'Open';
+        case 'resolved':
+            return 'Resolved';
         default:
             return props.status;
     }

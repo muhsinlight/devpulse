@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\WebhookEndpointController;
@@ -40,6 +41,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('webhooks/{webhookEndpoint}', [WebhookEndpointController::class, 'destroy'])->name('webhooks.destroy');
     Route::post('webhooks/{webhookEndpoint}/rotate', [WebhookEndpointController::class, 'rotate'])->name('webhooks.rotate');
     Route::post('webhooks/{webhookEndpoint}/rotate-hmac', [WebhookEndpointController::class, 'rotateHmac'])->name('webhooks.rotate-hmac');
+
+    Route::get('incidents', [IncidentController::class, 'index'])->name('incidents.index');
+    Route::get('incidents/{incident}', [IncidentController::class, 'show'])->name('incidents.show');
 });
 
 require __DIR__.'/auth.php';

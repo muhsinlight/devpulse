@@ -90,3 +90,19 @@ export type DashboardStats = {
     average_uptime: number;
     total_webhook_requests_today: number;
 };
+
+export type IncidentStatus = 'open' | 'resolved';
+
+export type Incident = {
+    id: number;
+    monitor_id: number;
+    status: IncidentStatus;
+    opened_at: string;
+    resolved_at: string | null;
+    last_error_message: string | null;
+    opened_status_code: number | null;
+    resolved_status_code: number | null;
+    created_at: string;
+    updated_at: string;
+    monitor?: Monitor;
+};

@@ -13,8 +13,11 @@ use Throwable;
 
 class CheckMonitorAction
 {
+    public function __construct(public RecordMonitorIncidentAction $recordIncident) {}
+
     public function handle(Monitor $monitor): MonitorResult
     {
+        $previousStatus = $monitor->status;
         $startedAt = hrtime(true);
         $statusCode = null;
         $errorMessage = null;
@@ -69,6 +72,8 @@ class CheckMonitorAction
                 ? now()->addMinutes($monitor->check_interval)
                 : null,
         ]);
+
+        $this->recordIncident->handle($monitor->refresh(), $result, $previousStatus);
 
         return $result;
     }
