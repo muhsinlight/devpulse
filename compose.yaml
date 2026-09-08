@@ -1,0 +1,160 @@
+name: devpulse
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-devpulse}
+      POSTGRES_USER: ${DB_USERNAME:-devpulse}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-devpulse} -d ${DB_DATABASE:-devpulse}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - internal
+
+  app:
+    image: ${DEVPULSE_IMAGE:-devpulse:app}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app
+      args:
+        VITE_APP_NAME: ${VITE_APP_NAME:-DevPulse}
+        VITE_REVERB_APP_KEY: ${VITE_REVERB_APP_KEY:-}
+        VITE_REVERB_HOST: ${VITE_REVERB_HOST:-}
+        VITE_REVERB_PORT: ${VITE_REVERB_PORT:-443}
+        VITE_REVERB_SCHEME: ${VITE_REVERB_SCHEME:-https}
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: app
+    volumes:
+      - storage_data:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "php -r 'exit(@fsockopen(\"127.0.0.1\", 9000) ? 0 : 1);'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    networks:
+      - internal
+
+  worker:
+    image: ${DEVPULSE_IMAGE:-devpulse:app}
+    pull_policy: never
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: worker
+    volumes:
+      - storage_data:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+    networks:
+      - internal
+
+  scheduler:
+    image: ${DEVPULSE_IMAGE:-devpulse:app}
+    pull_policy: never
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: scheduler
+    volumes:
+      - storage_data:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+    networks:
+      - internal
+
+  reverb:
+    image: ${DEVPULSE_IMAGE:-devpulse:app}
+    pull_policy: never
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: reverb
+    volumes:
+      - storage_data:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+    networks:
+      - internal
+
+  nginx:
+    image: ${DEVPULSE_NGINX_IMAGE:-devpulse:nginx}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: nginx
+      args:
+        VITE_APP_NAME: ${VITE_APP_NAME:-DevPulse}
+        VITE_REVERB_APP_KEY: ${VITE_REVERB_APP_KEY:-}
+        VITE_REVERB_HOST: ${VITE_REVERB_HOST:-}
+        VITE_REVERB_PORT: ${VITE_REVERB_PORT:-443}
+        VITE_REVERB_SCHEME: ${VITE_REVERB_SCHEME:-https}
+    restart: unless-stopped
+    ports:
+      - "${APP_HTTP_PORT:-80}:80"
+    volumes:
+      - storage_data:/var/www/html/storage:ro
+    depends_on:
+      app:
+        condition: service_healthy
+      reverb:
+        condition: service_started
+    networks:
+      - internal
+
+volumes:
+  postgres_data:
+  redis_data:
+  storage_data:
+
+networks:
+  internal:
+    driver: bridge
