@@ -16,6 +16,7 @@ storage/framework/sessions
 storage/framework/testing
 storage/framework/views
 bootstrap/ssr
+bootstrap/cache/*.php
 public/hot
 public/build
 public/storage

@@ -1,26 +1,31 @@
 # syntax=docker/dockerfile:1
 
-FROM php:8.4-fpm-bookworm AS app
+FROM php:8.4-fpm-bookworm AS php-runtime
+
+COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /usr/local/bin/
+
+RUN install-php-extensions \
+        pcntl pdo_pgsql pdo_sqlite redis intl zip bcmath opcache sockets \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && sed -i 's/listen = 127.0.0.1:9000/listen = 0.0.0.0:9000/' /usr/local/etc/php-fpm.d/www.conf
+
+WORKDIR /var/www/html
+
+FROM php-runtime AS php-build
 
 ENV COMPOSER_ALLOW_SUPERUSER=1 \
     COMPOSER_NO_INTERACTION=1
 
-COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /usr/local/bin/
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-RUN install-php-extensions pcntl pdo_pgsql redis intl zip bcmath opcache sockets \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates git unzip \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=node:22-bookworm /usr/local/bin/node /usr/local/bin/node
-COPY --from=node:22-bookworm /usr/local/lib/node_modules /usr/local/lib/node_modules
-RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
-    && ln -sf /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
-    && npm install -g pnpm@12.0.0 \
-    && node -v && npm -v && pnpm -v
-
-WORKDIR /var/www/html
+FROM php-build AS php-vendor
 
 COPY composer.json composer.lock ./
 RUN composer install \
@@ -30,10 +35,51 @@ RUN composer install \
     --prefer-dist \
     --no-interaction
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* .npmrc* ./
+FROM php-build AS php-code
+
+COPY --from=php-vendor /var/www/html/vendor ./vendor
+COPY . .
+
+# ENV beats Coolify's injected DB_* ARGs for every later RUN in this stage.
+# This stage is not the runtime image, so dummy values never ship as app ENV.
+ENV APP_ENV=production \
+    APP_DEBUG=false \
+    APP_KEY=base64:ZHVtbXktYnVpbGQta2V5LW5vdC1mb3ItcHJ1bj09 \
+    DB_CONNECTION=sqlite \
+    DB_DATABASE=/tmp/build.sqlite \
+    CACHE_STORE=array \
+    SESSION_DRIVER=array \
+    QUEUE_CONNECTION=sync \
+    BROADCAST_CONNECTION=log
+
+RUN mkdir -p \
+        storage/app/public \
+        storage/app/private \
+        storage/framework/cache/data \
+        storage/framework/sessions \
+        storage/framework/testing \
+        storage/framework/views \
+        storage/logs \
+        bootstrap/cache \
+    && composer dump-autoload --optimize --no-dev --no-scripts --no-interaction \
+    && rm -f bootstrap/cache/packages.php bootstrap/cache/services.php \
+    && touch /tmp/build.sqlite \
+    && php artisan package:discover --ansi \
+    && php artisan wayfinder:generate --with-form --no-interaction \
+    && rm -f /tmp/build.sqlite
+
+FROM node:22-bookworm AS assets
+
+WORKDIR /app
+
+RUN npm install -g pnpm@12.0.0
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 RUN pnpm install --frozen-lockfile --config.production=false
 
 COPY . .
+COPY --from=php-code /var/www/html/vendor ./vendor
+COPY --from=php-code /var/www/html/resources/js ./resources/js
 
 ARG VITE_APP_NAME=DevPulse
 ARG VITE_REVERB_APP_KEY
@@ -44,34 +90,25 @@ ENV VITE_APP_NAME=$VITE_APP_NAME \
     VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY \
     VITE_REVERB_HOST=$VITE_REVERB_HOST \
     VITE_REVERB_PORT=$VITE_REVERB_PORT \
-    VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME
+    VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME \
+    WAYFINDER_COMMAND=true \
+    CI=true
 
-# Dummy values for artisan/vite only. Coolify also injects DB_* as build-args;
-# exporting here wins for this layer so the build never talks to Postgres.
-RUN touch /tmp/build.sqlite \
-    && export \
-        APP_ENV=production \
-        APP_DEBUG=false \
-        APP_KEY=base64:ZHVtbXktYnVpbGQta2V5LW5vdC1mb3ItcHJ1bj09 \
-        DB_CONNECTION=sqlite \
-        DB_DATABASE=/tmp/build.sqlite \
-    && composer dump-autoload --optimize --no-dev --no-interaction \
-    && php artisan package:discover --ansi \
-    && php artisan wayfinder:generate --with-form --no-interaction \
-    && pnpm exec vite build \
-    && rm -rf node_modules /root/.npm /tmp/build.sqlite \
-    && chown -R www-data:www-data storage bootstrap/cache
+RUN pnpm exec vite build \
+    && test -f public/build/manifest.json \
+    && rm -rf node_modules
 
-ENV APP_ENV=production \
-    APP_DEBUG=false \
-    APP_KEY= \
-    DB_CONNECTION=pgsql \
-    DB_DATABASE=
+FROM php-runtime AS app
+
+COPY --from=php-code /var/www/html /var/www/html
+COPY --from=assets /app/public/build /var/www/html/public/build
+
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && test -f public/build/manifest.json
 
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/zz-opcache.ini
 COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh \
-    && sed -i 's/listen = 127.0.0.1:9000/listen = 0.0.0.0:9000/' /usr/local/etc/php-fpm.d/www.conf
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
