@@ -2,16 +2,23 @@
 
 FROM php:8.4-fpm-bookworm AS app
 
+ENV COMPOSER_ALLOW_SUPERUSER=1 \
+    COMPOSER_NO_INTERACTION=1
+
 COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /usr/local/bin/
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-COPY --from=node:22-bookworm /usr/local /usr/local
 
-RUN corepack enable \
-    && corepack prepare pnpm@12.0.0 --activate \
-    && install-php-extensions pcntl pdo_pgsql redis intl zip bcmath opcache sockets \
+RUN install-php-extensions pcntl pdo_pgsql redis intl zip bcmath opcache sockets \
     && apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates unzip git \
+    && apt-get install -y --no-install-recommends ca-certificates git unzip \
     && rm -rf /var/lib/apt/lists/*
+
+COPY --from=node:22-bookworm /usr/local/bin/node /usr/local/bin/node
+COPY --from=node:22-bookworm /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
+    && ln -sf /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
+    && npm install -g pnpm@12.0.0 \
+    && node -v && npm -v && pnpm -v
 
 WORKDIR /var/www/html
 
@@ -28,16 +35,6 @@ RUN pnpm install --frozen-lockfile --config.production=false
 
 COPY . .
 
-ENV APP_ENV=production \
-    APP_DEBUG=false \
-    APP_KEY=base64:ZHVtbXktYnVpbGQta2V5LW5vdC1mb3ItcHJ1bj09 \
-    DB_CONNECTION=sqlite \
-    DB_DATABASE=/tmp/build.sqlite
-
-RUN touch /tmp/build.sqlite \
-    && composer dump-autoload --optimize --no-dev --no-interaction \
-    && php artisan package:discover --ansi
-
 ARG VITE_APP_NAME=DevPulse
 ARG VITE_REVERB_APP_KEY
 ARG VITE_REVERB_HOST
@@ -49,27 +46,27 @@ ENV VITE_APP_NAME=$VITE_APP_NAME \
     VITE_REVERB_PORT=$VITE_REVERB_PORT \
     VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME
 
-# Coolify injects DB_* build-args; prefix dummy values so artisan/vite never
-# try Postgres. Use `vite build`, not `vp build` — vp downloads its own Node.
-RUN APP_ENV=production \
-    APP_DEBUG=false \
-    APP_KEY=base64:ZHVtbXktYnVpbGQta2V5LW5vdC1mb3ItcHJ1bj09 \
-    DB_CONNECTION=sqlite \
-    DB_DATABASE=/tmp/build.sqlite \
-    php artisan wayfinder:generate --with-form --no-interaction \
-    && APP_ENV=production \
-    APP_DEBUG=false \
-    APP_KEY=base64:ZHVtbXktYnVpbGQta2V5LW5vdC1mb3ItcHJ1bj09 \
-    DB_CONNECTION=sqlite \
-    DB_DATABASE=/tmp/build.sqlite \
-    pnpm exec vite build \
-    && rm -rf node_modules /root/.local /root/.npm /tmp/corepack-cache \
-    && chown -R www-data:www-data storage bootstrap/cache \
-    && rm -f /tmp/build.sqlite
+# Dummy values for artisan/vite only. Coolify also injects DB_* as build-args;
+# exporting here wins for this layer so the build never talks to Postgres.
+RUN touch /tmp/build.sqlite \
+    && export \
+        APP_ENV=production \
+        APP_DEBUG=false \
+        APP_KEY=base64:ZHVtbXktYnVpbGQta2V5LW5vdC1mb3ItcHJ1bj09 \
+        DB_CONNECTION=sqlite \
+        DB_DATABASE=/tmp/build.sqlite \
+    && composer dump-autoload --optimize --no-dev --no-interaction \
+    && php artisan package:discover --ansi \
+    && php artisan wayfinder:generate --with-form --no-interaction \
+    && pnpm exec vite build \
+    && rm -rf node_modules /root/.npm /tmp/build.sqlite \
+    && chown -R www-data:www-data storage bootstrap/cache
 
-ENV APP_KEY= \
-    DB_DATABASE= \
-    DB_CONNECTION=pgsql
+ENV APP_ENV=production \
+    APP_DEBUG=false \
+    APP_KEY= \
+    DB_CONNECTION=pgsql \
+    DB_DATABASE=
 
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/zz-opcache.ini
 COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
