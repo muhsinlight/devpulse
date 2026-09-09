@@ -4,12 +4,9 @@ FROM php:8.4-fpm-bookworm AS app
 
 COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /usr/local/bin/
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-COPY --from=node:22-bookworm /usr/local/bin/node /usr/local/bin/node
-COPY --from=node:22-bookworm /usr/local/bin/corepack /usr/local/bin/corepack
-COPY --from=node:22-bookworm /usr/local/lib/node_modules /usr/local/lib/node_modules
+COPY --from=node:22-bookworm /usr/local /usr/local
 
-RUN corepack enable \
-    && corepack prepare pnpm@12.0.0 --activate \
+RUN npm install -g pnpm@latest \
     && install-php-extensions pcntl pdo_pgsql redis intl zip bcmath opcache sockets \
     && apt-get update \
     && apt-get install -y --no-install-recommends unzip git \
@@ -25,7 +22,7 @@ RUN composer install \
     --prefer-dist \
     --no-interaction
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* .npmrc* ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
