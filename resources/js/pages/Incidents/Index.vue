@@ -16,7 +16,10 @@ defineProps<{
     })[];
 }>();
 
-const formatDuration = (openedAt: string, resolvedAt: string | null): string => {
+const formatDuration = (
+    openedAt: string,
+    resolvedAt: string | null,
+): string => {
     const start = new Date(openedAt).getTime();
     const end = resolvedAt ? new Date(resolvedAt).getTime() : Date.now();
     const totalSeconds = Math.max(0, Math.floor((end - start) / 1000));
@@ -116,9 +119,7 @@ const formatDuration = (openedAt: string, resolvedAt: string | null): string => 
                             <Link
                                 v-if="incident.monitor?.project"
                                 :href="
-                                    showProject.url(
-                                        incident.monitor.project.id,
-                                    )
+                                    showProject.url(incident.monitor.project.id)
                                 "
                                 class="text-xs font-medium hover:underline"
                             >

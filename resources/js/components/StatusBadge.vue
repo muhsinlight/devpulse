@@ -4,7 +4,14 @@ import { computed } from 'vue';
 
 const props = withDefaults(
     defineProps<{
-        status: MonitorStatus | 'success' | 'failed' | 'active' | 'inactive' | 'open' | 'resolved';
+        status:
+            | MonitorStatus
+            | 'success'
+            | 'failed'
+            | 'active'
+            | 'inactive'
+            | 'open'
+            | 'resolved';
         size?: 'xs' | 'sm' | 'md' | 'lg';
         showDot?: boolean;
     }>(),

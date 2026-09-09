@@ -1,0 +1,25 @@
+#!/bin/sh
+set -e
+
+cd "$(dirname "$0")/.."
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+
+if [ -z "$staged" ]; then
+    exit 0
+fi
+
+php_files=$(printf '%s\n' "$staged" | grep -E '\.php$' || true)
+frontend_files=$(printf '%s\n' "$staged" | grep -E '\.(vue|js|ts|tsx|jsx|mjs|cjs|json|ya?ml|css)$' || true)
+
+if [ -n "$php_files" ]; then
+    echo "Formatting staged PHP files with Pint..."
+    printf '%s\n' "$php_files" | tr '\n' '\0' | xargs -0 php vendor/bin/pint
+    printf '%s\n' "$php_files" | tr '\n' '\0' | xargs -0 git add --
+fi
+
+if [ -n "$frontend_files" ]; then
+    echo "Formatting staged Vue/JS/JSON/YAML files with vp check --fix..."
+    printf '%s\n' "$frontend_files" | tr '\n' '\0' | xargs -0 npx --no-install vp check --fix --no-lint --no-error-on-unmatched-pattern --
+    printf '%s\n' "$frontend_files" | tr '\n' '\0' | xargs -0 git add --
+fi

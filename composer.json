@@ -52,7 +52,8 @@
             "@php artisan key:generate",
             "@php artisan migrate --force",
             "npm install",
-            "npm run build"
+            "npm run build",
+            "@hooks:install"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
@@ -63,6 +64,10 @@
         ],
         "lint:check": [
             "pint --parallel --test"
+        ],
+        "format": [
+            "pint --parallel --dirty",
+            "npm run check:fix"
         ],
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",

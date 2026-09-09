@@ -10,16 +10,16 @@ import { index as incidentsIndex } from '@/actions/App/Http/Controllers/Incident
 
 defineProps<{
     incident: Incident & {
-        monitor?: Pick<
-            Monitor,
-            'id' | 'name' | 'url' | 'method' | 'status'
-        > & {
+        monitor?: Pick<Monitor, 'id' | 'name' | 'url' | 'method' | 'status'> & {
             project?: Pick<Project, 'id' | 'name' | 'color' | 'slug'>;
         };
     };
 }>();
 
-const formatDuration = (openedAt: string, resolvedAt: string | null): string => {
+const formatDuration = (
+    openedAt: string,
+    resolvedAt: string | null,
+): string => {
     const start = new Date(openedAt).getTime();
     const end = resolvedAt ? new Date(resolvedAt).getTime() : Date.now();
     const totalSeconds = Math.max(0, Math.floor((end - start) / 1000));
@@ -88,9 +88,7 @@ const formatDuration = (openedAt: string, resolvedAt: string | null): string => 
                     <p class="mt-2 font-mono text-sm font-bold">
                         <template v-if="incident.resolved_at">
                             {{
-                                new Date(
-                                    incident.resolved_at,
-                                ).toLocaleString()
+                                new Date(incident.resolved_at).toLocaleString()
                             }}
                         </template>
                         <template v-else>—</template>

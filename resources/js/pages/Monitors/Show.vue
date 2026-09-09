@@ -118,17 +118,12 @@ const deleteMonitor = () => {
                 {{ flashSuccess }}
             </div>
 
-            <div
-                v-if="openIncident"
-                class="alert alert-error text-sm"
-            >
+            <div v-if="openIncident" class="alert alert-error text-sm">
                 <div>
                     <p class="font-medium">Open incident</p>
                     <p class="mt-0.5 text-xs opacity-80">
                         Started
-                        {{
-                            new Date(openIncident.opened_at).toLocaleString()
-                        }}
+                        {{ new Date(openIncident.opened_at).toLocaleString() }}
                         ·
                         {{ openIncident.last_error_message ?? 'Check failed' }}
                     </p>
