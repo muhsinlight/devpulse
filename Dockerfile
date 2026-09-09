@@ -6,10 +6,11 @@ COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /u
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY --from=node:22-bookworm /usr/local /usr/local
 
-RUN npm install -g pnpm@latest \
+RUN corepack enable \
+    && corepack prepare pnpm@12.0.0 --activate \
     && install-php-extensions pcntl pdo_pgsql redis intl zip bcmath opcache sockets \
     && apt-get update \
-    && apt-get install -y --no-install-recommends unzip git \
+    && apt-get install -y --no-install-recommends ca-certificates unzip git \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
@@ -23,7 +24,7 @@ RUN composer install \
     --no-interaction
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* .npmrc* ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --config.production=false
 
 COPY . .
 
@@ -48,7 +49,20 @@ ENV VITE_APP_NAME=$VITE_APP_NAME \
     VITE_REVERB_PORT=$VITE_REVERB_PORT \
     VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME
 
-RUN pnpm run build \
+# Coolify injects DB_* build-args; prefix dummy values so artisan/vite never
+# try Postgres. Use `vite build`, not `vp build` — vp downloads its own Node.
+RUN APP_ENV=production \
+    APP_DEBUG=false \
+    APP_KEY=base64:ZHVtbXktYnVpbGQta2V5LW5vdC1mb3ItcHJ1bj09 \
+    DB_CONNECTION=sqlite \
+    DB_DATABASE=/tmp/build.sqlite \
+    php artisan wayfinder:generate --with-form --no-interaction \
+    && APP_ENV=production \
+    APP_DEBUG=false \
+    APP_KEY=base64:ZHVtbXktYnVpbGQta2V5LW5vdC1mb3ItcHJ1bj09 \
+    DB_CONNECTION=sqlite \
+    DB_DATABASE=/tmp/build.sqlite \
+    pnpm exec vite build \
     && rm -rf node_modules /root/.local /root/.npm /tmp/corepack-cache \
     && chown -R www-data:www-data storage bootstrap/cache \
     && rm -f /tmp/build.sqlite
