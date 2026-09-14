@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { Activity, Inbox, Radio } from 'lucide-vue-next';
+import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
+import InputError from '@/components/InputError.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import TextInput from '@/components/TextInput.vue';
 import ThemeToggle from '@/components/ThemeToggle.vue';
+import TurnstileWidget from '@/components/TurnstileWidget.vue';
 import { dashboard, home, login, register } from '@/routes';
+import { store as storeContact } from '@/routes/contact';
 
 interface Auth {
     user: {
@@ -16,6 +22,24 @@ interface Auth {
 defineProps<{
     auth?: Auth;
 }>();
+
+const page = usePage();
+const turnstileSiteKey = computed(() => page.props.turnstileSiteKey);
+const flashSuccess = computed(() => page.props.flash.success);
+
+const form = useForm({
+    name: '',
+    email: '',
+    message: '',
+    turnstile_token: '',
+});
+
+const submit = (): void => {
+    form.post(storeContact.url(), {
+        preserveScroll: true,
+        onSuccess: () => form.reset(),
+    });
+};
 </script>
 
 <template>
@@ -31,6 +55,9 @@ defineProps<{
 
             <nav class="flex items-center gap-1 sm:gap-2">
                 <ThemeToggle />
+                <a href="#contact" class="btn btn-ghost btn-sm hidden sm:inline-flex">
+                    Contact
+                </a>
                 <template v-if="auth?.user">
                     <Link
                         :href="dashboard.url()"
@@ -152,6 +179,100 @@ defineProps<{
                 </div>
             </div>
         </main>
+
+        <section
+            id="contact"
+            class="border-base-300 mx-auto w-full max-w-5xl border-t px-4 py-14 sm:px-6"
+        >
+            <div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
+                <div>
+                    <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+                        Contact
+                    </h2>
+                    <p class="text-base-content/60 mt-3 max-w-md text-sm leading-relaxed">
+                        Questions about monitoring, billing, or the product?
+                        Send a message and we will get back to you.
+                    </p>
+                </div>
+
+                <form class="space-y-4" @submit.prevent="submit">
+                    <div
+                        v-if="flashSuccess"
+                        class="alert alert-success text-sm"
+                    >
+                        {{ flashSuccess }}
+                    </div>
+
+                    <div>
+                        <label
+                            for="contact-name"
+                            class="text-base-content/70 mb-1.5 block text-xs font-semibold tracking-wider uppercase"
+                        >
+                            Name
+                        </label>
+                        <TextInput
+                            id="contact-name"
+                            v-model="form.name"
+                            autocomplete="name"
+                            :error="Boolean(form.errors.name)"
+                            required
+                        />
+                        <InputError :message="form.errors.name" />
+                    </div>
+
+                    <div>
+                        <label
+                            for="contact-email"
+                            class="text-base-content/70 mb-1.5 block text-xs font-semibold tracking-wider uppercase"
+                        >
+                            Email
+                        </label>
+                        <TextInput
+                            id="contact-email"
+                            v-model="form.email"
+                            type="email"
+                            autocomplete="email"
+                            :error="Boolean(form.errors.email)"
+                            required
+                        />
+                        <InputError :message="form.errors.email" />
+                    </div>
+
+                    <div>
+                        <label
+                            for="contact-message"
+                            class="text-base-content/70 mb-1.5 block text-xs font-semibold tracking-wider uppercase"
+                        >
+                            Message
+                        </label>
+                        <textarea
+                            id="contact-message"
+                            v-model="form.message"
+                            required
+                            rows="5"
+                            :class="[
+                                'textarea textarea-bordered bg-base-200/50 focus:bg-base-100 border-base-300 focus:border-primary focus:ring-primary/20 w-full text-sm transition-all duration-200 focus:ring-2',
+                                form.errors.message
+                                    ? 'textarea-error border-error focus:border-error focus:ring-error/20'
+                                    : '',
+                            ]"
+                        />
+                        <InputError :message="form.errors.message" />
+                    </div>
+
+                    <TurnstileWidget
+                        v-if="turnstileSiteKey"
+                        :site-key="turnstileSiteKey"
+                        @token="form.turnstile_token = $event"
+                    />
+                    <InputError :message="form.errors.turnstile_token" />
+
+                    <PrimaryButton :loading="form.processing">
+                        Send message
+                    </PrimaryButton>
+                </form>
+            </div>
+        </section>
 
         <footer
             class="border-base-300 text-base-content/40 border-t py-5 text-center text-xs"

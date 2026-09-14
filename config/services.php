@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'turnstile' => [
+        'site_key' => env('TURNSTILE_SITE_KEY'),
+        'secret' => env('TURNSTILE_SECRET_KEY'),
+    ],
+
+    'contact' => [
+        'to' => env('CONTACT_MAIL_TO', env('MAIL_FROM_ADDRESS')),
+    ],
+
 ];

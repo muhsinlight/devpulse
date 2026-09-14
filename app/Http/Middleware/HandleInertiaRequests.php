@@ -44,6 +44,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
             ],
+            'turnstileSiteKey' => config('services.turnstile.site_key') ?: null,
         ];
     }
 }

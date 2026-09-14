@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\MonitorController;
@@ -8,6 +9,10 @@ use App\Http\Controllers\WebhookEndpointController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
+
+Route::post('contact', ContactController::class)
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
 
 Route::any('hooks/{token}', [WebhookEndpointController::class, 'ingest'])
     ->name('webhooks.ingest');
