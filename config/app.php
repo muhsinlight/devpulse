@@ -43,6 +43,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Public Registration
+    |--------------------------------------------------------------------------
+    |
+    | When disabled, registration routes return 404 and Sign up links are
+    | hidden. Keep this false in production unless you intentionally open
+    | sign-up for demos.
+    |
+    */
+
+    'registration_enabled' => (bool) env('REGISTRATION_ENABLED', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |

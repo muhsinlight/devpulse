@@ -7,7 +7,6 @@ import InputError from '@/components/InputError.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import TextInput from '@/components/TextInput.vue';
 import ThemeToggle from '@/components/ThemeToggle.vue';
-import TurnstileWidget from '@/components/TurnstileWidget.vue';
 import { dashboard, home, login, register } from '@/routes';
 import { store as storeContact } from '@/routes/contact';
 
@@ -24,14 +23,13 @@ defineProps<{
 }>();
 
 const page = usePage();
-const turnstileSiteKey = computed(() => page.props.turnstileSiteKey);
+const canRegister = computed(() => page.props.canRegister);
 const flashSuccess = computed(() => page.props.flash.success);
 
 const form = useForm({
     name: '',
     email: '',
     message: '',
-    turnstile_token: '',
 });
 
 const submit = (): void => {
@@ -73,7 +71,11 @@ const submit = (): void => {
                     <Link :href="login.url()" class="btn btn-ghost btn-sm">
                         Sign in
                     </Link>
-                    <Link :href="register.url()" class="btn btn-primary btn-sm">
+                    <Link
+                        v-if="canRegister"
+                        :href="register.url()"
+                        class="btn btn-primary btn-sm"
+                    >
                         Get started
                     </Link>
                 </template>
@@ -103,10 +105,21 @@ const submit = (): void => {
                         </Link>
                     </template>
                     <template v-else>
-                        <Link :href="register.url()" class="btn btn-primary">
+                        <Link
+                            v-if="canRegister"
+                            :href="register.url()"
+                            class="btn btn-primary"
+                        >
                             Create account
                         </Link>
-                        <Link :href="login.url()" class="btn btn-outline">
+                        <Link
+                            :href="login.url()"
+                            :class="
+                                canRegister
+                                    ? 'btn btn-outline'
+                                    : 'btn btn-primary'
+                            "
+                        >
                             Sign in
                         </Link>
                     </template>
@@ -266,13 +279,6 @@ const submit = (): void => {
                         />
                         <InputError :message="form.errors.message" />
                     </div>
-
-                    <TurnstileWidget
-                        v-if="turnstileSiteKey"
-                        :site-key="turnstileSiteKey"
-                        @token="form.turnstile_token = $event"
-                    />
-                    <InputError :message="form.errors.turnstile_token" />
 
                     <PrimaryButton :loading="form.processing">
                         Send message

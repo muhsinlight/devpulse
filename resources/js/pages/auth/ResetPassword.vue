@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-vue-next';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import InputError from '@/components/InputError.vue';
+import PasswordChecklist from '@/components/PasswordChecklist.vue';
 import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import { store as storeNewPassword } from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
@@ -22,7 +23,23 @@ const form = useForm({
     password_confirmation: '',
 });
 
+const passwordMeetsRules = computed(() => {
+    const password = form.password;
+
+    return (
+        password.length >= 8 &&
+        /[A-Z]/.test(password) &&
+        /[a-z]/.test(password) &&
+        /\d/.test(password) &&
+        password === form.password_confirmation
+    );
+});
+
 const submit = () => {
+    if (!passwordMeetsRules.value) {
+        return;
+    }
+
     form.post(storeNewPassword.url(), {
         onFinish: () => {
             form.reset('password', 'password_confirmation');
@@ -39,7 +56,6 @@ const submit = () => {
         <Head title="Reset Password" />
 
         <form @submit.prevent="submit" class="space-y-4">
-            <!-- Email Field -->
             <div>
                 <label
                     for="email"
@@ -68,7 +84,6 @@ const submit = () => {
                 <InputError :message="form.errors.email" />
             </div>
 
-            <!-- New Password Field -->
             <div>
                 <label
                     for="password"
@@ -86,7 +101,7 @@ const submit = () => {
                         id="password"
                         :type="showPassword ? 'text' : 'password'"
                         v-model="form.password"
-                        placeholder="At least 8 characters"
+                        placeholder="Choose a strong password"
                         required
                         autocomplete="new-password"
                         :error="Boolean(form.errors.password)"
@@ -104,7 +119,6 @@ const submit = () => {
                 <InputError :message="form.errors.password" />
             </div>
 
-            <!-- Password Confirmation Field -->
             <div>
                 <label
                     for="password_confirmation"
@@ -132,9 +146,16 @@ const submit = () => {
                 <InputError :message="form.errors.password_confirmation" />
             </div>
 
-            <!-- Submit Button -->
+            <PasswordChecklist
+                :password="form.password"
+                :password-confirmation="form.password_confirmation"
+            />
+
             <div class="pt-2">
-                <PrimaryButton :loading="form.processing">
+                <PrimaryButton
+                    :loading="form.processing"
+                    :disabled="!passwordMeetsRules"
+                >
                     Reset password
                 </PrimaryButton>
             </div>

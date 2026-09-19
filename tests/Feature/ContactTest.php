@@ -1,15 +1,21 @@
 <?php
 
 use App\Mail\ContactMessage;
-use Illuminate\Http\Client\Request;
+use App\Notifications\ContactMessageReceivedNotification;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 
-test('queues a contact message when turnstile is not configured', function () {
+test('queues a contact message email', function () {
     Mail::fake();
+    Notification::fake();
     Http::preventStrayRequests();
 
-    config(['services.contact.to' => 'ops@example.com']);
+    config([
+        'services.contact.to' => 'ops@example.com',
+        'services.telegram.bot_token' => null,
+        'services.telegram.chat_id' => null,
+    ]);
 
     $response = $this->from(route('home'))->post(route('contact.store'), [
         'name' => 'Alex Morgan',
@@ -27,63 +33,24 @@ test('queues a contact message when turnstile is not configured', function () {
             && $mail->email === 'alex@company.com'
             && $mail->body === 'I have a question about billing.';
     });
+
+    Notification::assertNothingSent();
 });
 
-test('rejects a contact message when turnstile verification fails', function () {
+test('sends a telegram notification for contact when configured', function () {
     Mail::fake();
-    Http::preventStrayRequests();
+    Notification::fake();
 
     config([
-        'services.turnstile.site_key' => 'site-key',
-        'services.turnstile.secret' => 'secret-key',
         'services.contact.to' => 'ops@example.com',
-    ]);
-
-    Http::fake([
-        'https://challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
-            'success' => false,
-        ]),
+        'services.telegram.bot_token' => 'test-token',
+        'services.telegram.chat_id' => '123456',
     ]);
 
     $response = $this->from(route('home'))->post(route('contact.store'), [
         'name' => 'Alex Morgan',
         'email' => 'alex@company.com',
         'message' => 'I have a question about billing.',
-        'turnstile_token' => 'invalid-token',
-    ]);
-
-    $response
-        ->assertRedirect(route('home'))
-        ->assertSessionHasErrors('turnstile_token');
-
-    Mail::assertNothingOutgoing();
-
-    Http::assertSent(fn (Request $request): bool => $request->url() === 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
-        && $request['response'] === 'invalid-token'
-        && $request['secret'] === 'secret-key');
-});
-
-test('queues a contact message when turnstile verification succeeds', function () {
-    Mail::fake();
-    Http::preventStrayRequests();
-
-    config([
-        'services.turnstile.site_key' => 'site-key',
-        'services.turnstile.secret' => 'secret-key',
-        'services.contact.to' => 'ops@example.com',
-    ]);
-
-    Http::fake([
-        'https://challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
-            'success' => true,
-        ]),
-    ]);
-
-    $response = $this->from(route('home'))->post(route('contact.store'), [
-        'name' => 'Alex Morgan',
-        'email' => 'alex@company.com',
-        'message' => 'I have a question about billing.',
-        'turnstile_token' => 'valid-token',
     ]);
 
     $response
@@ -91,12 +58,12 @@ test('queues a contact message when turnstile verification succeeds', function (
         ->assertSessionHas('success');
 
     Mail::assertQueued(ContactMessage::class);
-
-    Http::assertSent(fn (Request $request): bool => $request['response'] === 'valid-token');
+    Notification::assertSentOnDemand(ContactMessageReceivedNotification::class);
 });
 
 test('rejects a contact message when required fields are missing', function () {
     Mail::fake();
+    Notification::fake();
 
     $response = $this->from(route('home'))->post(route('contact.store'), []);
 
@@ -105,4 +72,5 @@ test('rejects a contact message when required fields are missing', function () {
         ->assertSessionHasErrors(['name', 'email', 'message']);
 
     Mail::assertNothingOutgoing();
+    Notification::assertNothingSent();
 });

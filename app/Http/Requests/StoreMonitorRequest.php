@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\HttpMethod;
 use App\Models\Monitor;
 use App\Models\Project;
+use App\Rules\PublicHttpUrl;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -31,7 +32,7 @@ class StoreMonitorRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'url' => ['required', 'url', 'max:2048'],
+            'url' => ['required', 'url', 'max:2048', new PublicHttpUrl],
             'method' => ['required', Rule::enum(HttpMethod::class)],
             'headers' => ['nullable', 'array', 'max:20'],
             'headers.*' => ['required', 'string', 'max:2000'],

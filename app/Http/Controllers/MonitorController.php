@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\CheckMonitorAction;
 use App\Enums\MonitorStatus;
+use App\Events\MonitorCreated;
 use App\Http\Requests\StoreMonitorRequest;
 use App\Http\Requests\UpdateMonitorRequest;
 use App\Models\Monitor;
@@ -59,6 +60,8 @@ class MonitorController extends Controller
             'uptime_percentage' => 100,
             'next_check_at' => ($validated['is_active'] ?? true) ? now() : null,
         ]);
+
+        MonitorCreated::dispatch($monitor);
 
         return redirect()->route('monitors.show', $monitor);
     }

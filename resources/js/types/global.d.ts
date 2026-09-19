@@ -21,7 +21,12 @@ declare module '@inertiajs/core' {
             flash: {
                 success: string | null;
             };
-            turnstileSiteKey: string | null;
+            canRegister: boolean;
+            passwordRules: {
+                min: number;
+                mixedCase: boolean;
+                numbers: boolean;
+            };
             sidebarOpen: boolean;
             [key: string]: unknown;
         };
@@ -33,23 +38,6 @@ declare module 'vue' {
         $inertia: typeof Router;
         $page: Page;
         $headManager: ReturnType<typeof createHeadManager>;
-    }
-}
-
-declare global {
-    interface Window {
-        turnstile?: {
-            render: (
-                element: HTMLElement,
-                options: {
-                    sitekey: string;
-                    callback: (token: string) => void;
-                    'expired-callback'?: () => void;
-                    'error-callback'?: () => void;
-                },
-            ) => string;
-            remove: (widgetId: string) => void;
-        };
     }
 }
 

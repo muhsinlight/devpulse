@@ -6,9 +6,17 @@ use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\WebhookEndpointController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
-Route::inertia('/', 'Welcome')->name('home');
+Route::get('/', function (Request $request) {
+    if ($request->user()) {
+        return redirect()->route('dashboard');
+    }
+
+    return Inertia::render('Welcome');
+})->name('home');
 
 Route::post('contact', ContactController::class)
     ->middleware('throttle:5,1')

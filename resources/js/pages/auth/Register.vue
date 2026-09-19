@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-vue-next';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import InputError from '@/components/InputError.vue';
+import PasswordChecklist from '@/components/PasswordChecklist.vue';
 import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import { login } from '@/routes';
@@ -18,7 +19,23 @@ const form = useForm({
     password_confirmation: '',
 });
 
+const passwordMeetsRules = computed(() => {
+    const password = form.password;
+
+    return (
+        password.length >= 8 &&
+        /[A-Z]/.test(password) &&
+        /[a-z]/.test(password) &&
+        /\d/.test(password) &&
+        password === form.password_confirmation
+    );
+});
+
 const submit = () => {
+    if (!passwordMeetsRules.value) {
+        return;
+    }
+
     form.post(storeRegistration.url(), {
         onFinish: () => {
             form.reset('password', 'password_confirmation');
@@ -35,7 +52,6 @@ const submit = () => {
         <Head title="Sign Up" />
 
         <form @submit.prevent="submit" class="space-y-4">
-            <!-- Full Name Field -->
             <div>
                 <label
                     for="name"
@@ -64,7 +80,6 @@ const submit = () => {
                 <InputError :message="form.errors.name" />
             </div>
 
-            <!-- Email Field -->
             <div>
                 <label
                     for="email"
@@ -92,7 +107,6 @@ const submit = () => {
                 <InputError :message="form.errors.email" />
             </div>
 
-            <!-- Password Field -->
             <div>
                 <label
                     for="password"
@@ -110,7 +124,7 @@ const submit = () => {
                         id="password"
                         :type="showPassword ? 'text' : 'password'"
                         v-model="form.password"
-                        placeholder="At least 8 characters"
+                        placeholder="Choose a strong password"
                         required
                         autocomplete="new-password"
                         :error="Boolean(form.errors.password)"
@@ -128,7 +142,6 @@ const submit = () => {
                 <InputError :message="form.errors.password" />
             </div>
 
-            <!-- Password Confirmation Field -->
             <div>
                 <label
                     for="password_confirmation"
@@ -156,14 +169,20 @@ const submit = () => {
                 <InputError :message="form.errors.password_confirmation" />
             </div>
 
-            <!-- Submit Button -->
+            <PasswordChecklist
+                :password="form.password"
+                :password-confirmation="form.password_confirmation"
+            />
+
             <div class="pt-2">
-                <PrimaryButton :loading="form.processing">
+                <PrimaryButton
+                    :loading="form.processing"
+                    :disabled="!passwordMeetsRules"
+                >
                     Create account
                 </PrimaryButton>
             </div>
 
-            <!-- Login Link -->
             <div class="border-base-200 border-t pt-3 text-center">
                 <p class="text-base-content/60 text-xs">
                     Already have an account?

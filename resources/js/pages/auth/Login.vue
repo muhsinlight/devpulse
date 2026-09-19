@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-vue-next';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import InputError from '@/components/InputError.vue';
@@ -14,6 +14,9 @@ defineProps<{
     canResetPassword?: boolean;
     status?: string;
 }>();
+
+const page = usePage();
+const canRegister = computed(() => page.props.canRegister);
 
 const showPassword = ref(false);
 
@@ -153,7 +156,7 @@ const submit = () => {
             </div>
 
             <!-- Register Link -->
-            <div class="border-base-200 border-t pt-3 text-center">
+            <div v-if="canRegister" class="border-base-200 border-t pt-3 text-center">
                 <p class="text-base-content/60 text-xs">
                     Don't have an account yet?
                     <Link

@@ -61,10 +61,12 @@ test('resolving an incident sends a telegram notification when configured', func
     Notification::assertSentOnDemand(MonitorIncidentResolvedNotification::class);
 });
 
-test('incidents do not notify telegram when bot is not configured', function () {
+test('incidents do not notify when telegram and ops email are unset', function () {
     config([
         'services.telegram.bot_token' => null,
         'services.telegram.chat_id' => null,
+        'services.contact.to' => null,
+        'mail.from.address' => null,
     ]);
 
     Notification::fake();

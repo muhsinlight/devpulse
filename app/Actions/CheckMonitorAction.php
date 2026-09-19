@@ -9,6 +9,7 @@ use App\Models\MonitorResult;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class CheckMonitorAction
@@ -71,6 +72,14 @@ class CheckMonitorAction
             'next_check_at' => $monitor->is_active
                 ? now()->addMinutes($monitor->check_interval)
                 : null,
+        ]);
+
+        Log::info('Monitor checked.', [
+            'monitor_id' => $monitor->id,
+            'status' => $isSuccess ? MonitorStatus::Online->value : MonitorStatus::Offline->value,
+            'status_code' => $statusCode,
+            'response_time_ms' => $responseTimeMs,
+            'is_success' => $isSuccess,
         ]);
 
         $this->recordIncident->handle($monitor->refresh(), $result, $previousStatus);

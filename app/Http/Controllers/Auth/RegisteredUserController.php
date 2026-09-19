@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RegisteredUserController extends Controller
 {
@@ -20,6 +21,8 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
+        $this->ensureRegistrationIsEnabled();
+
         return Inertia::render('auth/Register');
     }
 
@@ -30,6 +33,8 @@ class RegisteredUserController extends Controller
      */
     public function store(RegisterRequest $request): RedirectResponse
     {
+        $this->ensureRegistrationIsEnabled();
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -41,5 +46,12 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         return redirect(route('dashboard', absolute: false));
+    }
+
+    private function ensureRegistrationIsEnabled(): void
+    {
+        if (! config('app.registration_enabled')) {
+            throw new NotFoundHttpException;
+        }
     }
 }
