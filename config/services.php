@@ -44,4 +44,9 @@ return [
         'to' => env('CONTACT_MAIL_TO', env('MAIL_FROM_ADDRESS')),
     ],
 
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'chat_id' => env('TELEGRAM_CHAT_ID'),
+    ],
+
 ];

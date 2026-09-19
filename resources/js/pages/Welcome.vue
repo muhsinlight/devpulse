@@ -55,7 +55,10 @@ const submit = (): void => {
 
             <nav class="flex items-center gap-1 sm:gap-2">
                 <ThemeToggle />
-                <a href="#contact" class="btn btn-ghost btn-sm hidden sm:inline-flex">
+                <a
+                    href="#contact"
+                    class="btn btn-ghost btn-sm hidden sm:inline-flex"
+                >
                     Contact
                 </a>
                 <template v-if="auth?.user">
@@ -186,10 +189,14 @@ const submit = (): void => {
         >
             <div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
                 <div>
-                    <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+                    <h2
+                        class="text-2xl font-semibold tracking-tight sm:text-3xl"
+                    >
                         Contact
                     </h2>
-                    <p class="text-base-content/60 mt-3 max-w-md text-sm leading-relaxed">
+                    <p
+                        class="text-base-content/60 mt-3 max-w-md text-sm leading-relaxed"
+                    >
                         Questions about monitoring, billing, or the product?
                         Send a message and we will get back to you.
                     </p>
