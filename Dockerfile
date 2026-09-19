@@ -7,7 +7,7 @@ COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /u
 RUN install-php-extensions \
         pcntl pdo_pgsql pdo_sqlite redis intl zip bcmath opcache sockets \
     && apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates \
+    && apt-get install -y --no-install-recommends ca-certificates procps \
     && rm -rf /var/lib/apt/lists/* \
     && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
     && sed -i 's/listen = 127.0.0.1:9000/listen = 0.0.0.0:9000/' /usr/local/etc/php-fpm.d/www.conf

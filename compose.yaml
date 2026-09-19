@@ -90,6 +90,16 @@ services:
                 condition: service_healthy
             app:
                 condition: service_healthy
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    "ps aux | grep -v grep | grep -q 'artisan queue:work' || exit 1",
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
         networks:
             - internal
 
@@ -110,6 +120,16 @@ services:
                 condition: service_healthy
             app:
                 condition: service_healthy
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    "ps aux | grep -v grep | grep -q 'artisan schedule' || exit 1",
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
         networks:
             - internal
 
@@ -130,6 +150,16 @@ services:
                 condition: service_healthy
             app:
                 condition: service_healthy
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'php -r ''exit(@fsockopen("127.0.0.1", 8080) ? 0 : 1);''',
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
         networks:
             - internal
 
@@ -155,6 +185,16 @@ services:
                 condition: service_healthy
             reverb:
                 condition: service_started
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'wget -qO- http://127.0.0.1:80/up || wget -qO- http://127.0.0.1:80/ || exit 1',
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
         networks:
             - internal
 
