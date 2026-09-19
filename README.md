@@ -63,13 +63,13 @@ Creates `test@example.com` / `password`, sample projects, and a demo webhook inb
 
 ## Important environment flags
 
-| Variable | Purpose |
-| --- | --- |
-| `REGISTRATION_ENABLED` | Default `false`. When `false`, `/register` returns 404 and Sign up links are hidden. Set `true` for local demos. |
-| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | Optional. When set, ops alerts use Telegram. When empty, the same alerts go by email. |
-| `MAIL_MAILER` / `RESEND_API_KEY` | Use `MAIL_MAILER=resend` and a Resend API key for real email (contact form + ops alerts). |
-| `CONTACT_MAIL_TO` | Inbox for contact form and email ops alerts (falls back to `MAIL_FROM_ADDRESS`). |
-| `APP_DEBUG` | Keep `false` outside local development. |
+| Variable                                  | Purpose                                                                                                          |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `REGISTRATION_ENABLED`                    | Default `false`. When `false`, `/register` returns 404 and Sign up links are hidden. Set `true` for local demos. |
+| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | Optional. When set, ops alerts use Telegram. When empty, the same alerts go by email.                            |
+| `MAIL_MAILER` / `RESEND_API_KEY`          | Use `MAIL_MAILER=resend` and a Resend API key for real email (contact form + ops alerts).                        |
+| `CONTACT_MAIL_TO`                         | Inbox for contact form and email ops alerts (falls back to `MAIL_FROM_ADDRESS`).                                 |
+| `APP_DEBUG`                               | Keep `false` outside local development.                                                                          |
 
 See `.env.example` and `docker/.env.example` for the full list.
 

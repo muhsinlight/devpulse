@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 /*
@@ -16,6 +17,10 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
+    ->beforeEach(function () {
+        // Monitor/incident tests hit real listeners; never notify Telegram/mail from .env.
+        Notification::fake();
+    })
     ->in('Feature');
 
 /*

@@ -39,7 +39,7 @@ class TelegramBot
             return true;
         } catch (RequestException $exception) {
             Log::warning('Telegram sendMessage failed.', [
-                'status' => $exception->response?->status(),
+                'status' => $exception->response->status(),
             ]);
 
             return false;

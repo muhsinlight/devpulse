@@ -156,7 +156,10 @@ const submit = () => {
             </div>
 
             <!-- Register Link -->
-            <div v-if="canRegister" class="border-base-200 border-t pt-3 text-center">
+            <div
+                v-if="canRegister"
+                class="border-base-200 border-t pt-3 text-center"
+            >
                 <p class="text-base-content/60 text-xs">
                     Don't have an account yet?
                     <Link

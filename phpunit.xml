@@ -32,5 +32,9 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- force=true so local .env Telegram/Resend keys never leak into feature tests -->
+        <env name="TELEGRAM_BOT_TOKEN" value="" force="true"/>
+        <env name="TELEGRAM_CHAT_ID" value="" force="true"/>
+        <env name="RESEND_API_KEY" value="" force="true"/>
     </php>
 </phpunit>

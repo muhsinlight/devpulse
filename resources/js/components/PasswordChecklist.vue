@@ -35,8 +35,7 @@ const checks = computed(() => {
             id: 'match',
             label: 'Passwords match',
             passed:
-                password.length > 0 &&
-                password === props.passwordConfirmation,
+                password.length > 0 && password === props.passwordConfirmation,
         },
     ];
 });

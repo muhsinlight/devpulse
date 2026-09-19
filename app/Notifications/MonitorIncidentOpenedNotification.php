@@ -48,7 +48,7 @@ class MonitorIncidentOpenedNotification extends Notification implements ShouldQu
                     'URL' => $monitor->url,
                     'Status' => (string) ($this->incident->opened_status_code ?? 'n/a'),
                     'Response time' => $responseTime,
-                    'Opened' => $this->incident->opened_at?->toDateTimeString() ?? 'n/a',
+                    'Opened' => $this->incident->opened_at->toDateTimeString(),
                     'Error' => $this->incident->last_error_message ?: 'No error message',
                 ],
                 'actionUrl' => route('incidents.show', $this->incident),
@@ -67,7 +67,7 @@ class MonitorIncidentOpenedNotification extends Notification implements ShouldQu
         $responseTime = $monitor->last_response_time_ms !== null
             ? "{$monitor->last_response_time_ms}ms"
             : 'n/a';
-        $openedAt = $this->incident->opened_at?->toDateTimeString() ?? 'n/a';
+        $openedAt = $this->incident->opened_at->toDateTimeString();
         $url = route('incidents.show', $this->incident);
 
         return implode("\n", [
