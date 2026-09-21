@@ -41,7 +41,7 @@ const submit = (): void => {
 </script>
 
 <template>
-    <Head title="DevPulse - API & Webhook Monitoring" />
+    <Head title="API & Webhook Monitoring" />
 
     <div class="bg-base-100 text-base-content flex min-h-screen flex-col">
         <header

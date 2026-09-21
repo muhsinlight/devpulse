@@ -12,21 +12,23 @@ This is a **learning / portfolio** project, not a production SaaS. Use it to exp
 - Queue worker + scheduler (required for automatic checks)
 - Laravel Reverb (optional; live webhook inbox)
 
+Frontend packages are installed with **pnpm** 12+ (`package.json` rejects npm/yarn).
+
 ## Quick start
 
 ```bash
 composer setup
 ```
 
-Or step by step:
+`composer setup` runs `pnpm install` and `pnpm run build`. Or step by step:
 
 ```bash
 composer install
 cp .env.example .env
 php artisan key:generate
 php artisan migrate
-npm install
-npm run build
+pnpm install
+pnpm run build
 ```
 
 Run the app locally (HTTP + queue + logs + Vite):
@@ -41,7 +43,7 @@ Automatic monitor checks also need the scheduler. In a separate terminal:
 php artisan schedule:work
 ```
 
-`composer run dev` already includes a queue worker. Without a worker and scheduler, monitors only update when you click **Check now**.
+`composer run dev` already includes a queue worker. Without a worker and scheduler, monitors only update when you click **Check now**. Captured webhook requests older than `WEBHOOK_REQUEST_RETENTION_DAYS` are pruned on the same scheduler.
 
 ### Frontend / Wayfinder
 
@@ -50,7 +52,7 @@ Generated Wayfinder TypeScript under `resources/js/actions` and `resources/js/ro
 ```bash
 php artisan wayfinder:generate
 # or as part of
-npm run build
+pnpm run build
 ```
 
 ### Demo data (local only)
@@ -61,6 +63,20 @@ php artisan db:seed
 
 Creates `test@example.com` / `password`, sample projects, and a demo webhook inbox (no monitors — create your own).
 
+## Production (Docker)
+
+The repo includes a multi-service Compose stack (`app`, `worker`, `scheduler`, `reverb`, `nginx`, PostgreSQL, Redis).
+
+1. Copy `docker/.env.example` to `.env` on the server and fill in production values (`APP_KEY`, `DB_PASSWORD`, Reverb keys, mail, `APP_URL`, etc.).
+2. Generate an app key if needed: `php artisan key:generate --show`, then set `APP_KEY` in `.env`.
+3. Deploy:
+
+```bash
+./deploy.sh
+```
+
+`deploy.sh` requires Docker Compose, pulls git (unless you pass `--no-pull`), builds the `app` and `nginx` images, starts the stack, and runs migrations. Confirm the app with `GET /up` on `APP_URL`.
+
 ## Important environment flags
 
 | Variable                                  | Purpose                                                                                                          |
@@ -69,6 +85,7 @@ Creates `test@example.com` / `password`, sample projects, and a demo webhook inb
 | `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | Optional. When set, ops alerts use Telegram. When empty, the same alerts go by email.                            |
 | `MAIL_MAILER` / `RESEND_API_KEY`          | Use `MAIL_MAILER=resend` and a Resend API key for real email (contact form + ops alerts).                        |
 | `CONTACT_MAIL_TO`                         | Inbox for contact form and email ops alerts (falls back to `MAIL_FROM_ADDRESS`).                                 |
+| `WEBHOOK_REQUEST_RETENTION_DAYS`          | Captured webhook payloads older than this many days are deleted daily. `0` keeps them forever. Default `30`.     |
 | `APP_DEBUG`                               | Keep `false` outside local development.                                                                          |
 
 See `.env.example` and `docker/.env.example` for the full list.
@@ -79,6 +96,7 @@ See `.env.example` and `docker/.env.example` for the full list.
 - **HTTP monitors** — interval checks via queue + `monitors:dispatch-due`
 - **Incidents** — open/resolve on status transitions; Telegram when configured
 - **Webhook inbox** — `/hooks/{token}`, optional HMAC, GeoIP, live Echo feed
+- **Webhook retention** — daily `webhooks:prune-requests` (see `WEBHOOK_REQUEST_RETENTION_DAYS`)
 - **Contact** — email via the configured mailer (+ Telegram when configured), rate-limited
 - **Ops alerts** — Telegram if configured; otherwise email (Resend-ready) for monitor created / down / recovered
 
@@ -93,7 +111,7 @@ See `.env.example` and `docker/.env.example` for the full list.
 
 ```bash
 php artisan test --compact
-# or the project CI script
+# or the project CI script (Pint, PHPStan, frontend check, then tests)
 composer ci:check
 ```
 

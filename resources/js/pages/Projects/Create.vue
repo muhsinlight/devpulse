@@ -32,7 +32,7 @@ const submit = () => {
 
 <template>
     <AppLayout>
-        <Head title="Create Project - DevPulse" />
+        <Head title="Create Project" />
 
         <div class="mx-auto max-w-xl space-y-6">
             <div>

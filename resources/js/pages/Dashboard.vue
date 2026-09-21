@@ -31,7 +31,7 @@ const user = (page.props.auth as Auth).user;
 
 <template>
     <AppLayout>
-        <Head title="Dashboard - DevPulse" />
+        <Head title="Dashboard" />
 
         <div
             class="flex flex-col justify-between gap-4 md:flex-row md:items-center"

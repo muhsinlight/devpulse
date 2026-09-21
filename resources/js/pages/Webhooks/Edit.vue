@@ -28,7 +28,7 @@ const submit = () => {
 
 <template>
     <AppLayout>
-        <Head :title="`Edit ${webhook.name} - DevPulse`" />
+        <Head :title="`Edit ${webhook.name}`" />
 
         <div class="mx-auto max-w-2xl space-y-6">
             <div>

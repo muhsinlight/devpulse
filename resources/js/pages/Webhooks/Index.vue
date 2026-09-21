@@ -20,7 +20,7 @@ const tokenHint = (token: string): string => token.slice(-4);
 
 <template>
     <AppLayout>
-        <Head title="Webhooks - DevPulse" />
+        <Head title="Webhooks" />
 
         <div
             class="flex flex-col justify-between gap-4 md:flex-row md:items-center"

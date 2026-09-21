@@ -46,7 +46,7 @@ const deleteProject = () => {
 
 <template>
     <AppLayout>
-        <Head :title="`${project.name} - DevPulse`" />
+        <Head :title="project.name" />
 
         <div class="space-y-6">
             <div>

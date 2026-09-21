@@ -52,7 +52,7 @@ const deleteMonitor = () => {
 
 <template>
     <AppLayout>
-        <Head :title="`${monitor.name} - DevPulse`" />
+        <Head :title="monitor.name" />
 
         <div class="space-y-6">
             <div>

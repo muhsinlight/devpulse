@@ -131,7 +131,7 @@ const pretty = (value: unknown): string => {
 
 <template>
     <AppLayout>
-        <Head :title="`${webhook.name} - DevPulse`" />
+        <Head :title="webhook.name" />
 
         <div class="space-y-6">
             <div>

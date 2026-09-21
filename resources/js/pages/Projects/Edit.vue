@@ -37,7 +37,7 @@ const submit = () => {
 
 <template>
     <AppLayout>
-        <Head :title="`Edit ${project.name} - DevPulse`" />
+        <Head :title="`Edit ${project.name}`" />
 
         <div class="mx-auto max-w-xl space-y-6">
             <div>

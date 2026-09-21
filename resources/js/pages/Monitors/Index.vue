@@ -19,7 +19,7 @@ defineProps<{
 
 <template>
     <AppLayout>
-        <Head title="Monitors - DevPulse" />
+        <Head title="Monitors" />
 
         <div
             class="flex flex-col justify-between gap-4 md:flex-row md:items-center"

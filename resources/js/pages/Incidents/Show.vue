@@ -40,7 +40,7 @@ const formatDuration = (
 
 <template>
     <AppLayout>
-        <Head title="Incident - DevPulse" />
+        <Head title="Incident" />
 
         <div class="space-y-6">
             <div>

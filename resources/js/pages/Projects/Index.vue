@@ -15,7 +15,7 @@ defineProps<{
 
 <template>
     <AppLayout>
-        <Head title="Projects - DevPulse" />
+        <Head title="Projects" />
 
         <div
             class="flex flex-col justify-between gap-4 md:flex-row md:items-center"
