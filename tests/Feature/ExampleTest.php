@@ -10,9 +10,10 @@ test('guests see the welcome page', function () {
 
 test('the document head links to the DevPulse favicon', function () {
     $this->get(route('home'))
-        ->assertSee('<link rel="icon" href="/favicon.ico" sizes="any">', false)
-        ->assertSee('<link rel="icon" href="/favicon.svg" type="image/svg+xml">', false)
-        ->assertSee('<link rel="apple-touch-icon" href="/apple-touch-icon.png">', false);
+        ->assertSee('/favicon-32x32.png', false)
+        ->assertSee('/images/logo-mark.png', false)
+        ->assertSee('/favicon.svg', false)
+        ->assertDontSee('laravel.com/img', false);
 });
 
 test('authenticated users are redirected from home to the dashboard', function () {
