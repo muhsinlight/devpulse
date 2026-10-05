@@ -79,14 +79,13 @@ The repo includes a multi-service Compose stack (`app`, `worker`, `scheduler`, `
 
 ## Important environment flags
 
-| Variable                                  | Purpose                                                                                                          |
-| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `REGISTRATION_ENABLED`                    | Default `false`. The first account can always register. After that, `/register` is 404 unless this is `true`.    |
-| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | Optional. When set, ops alerts use Telegram. When empty, the same alerts go by email.                            |
-| `MAIL_MAILER` / `RESEND_API_KEY`          | Use `MAIL_MAILER=resend` and a Resend API key for real email (contact form + ops alerts).                        |
-| `CONTACT_MAIL_TO`                         | Inbox for contact form and email ops alerts (falls back to `MAIL_FROM_ADDRESS`).                                 |
-| `WEBHOOK_REQUEST_RETENTION_DAYS`          | Captured webhook payloads older than this many days are deleted daily. `0` keeps them forever. Default `30`.     |
-| `APP_DEBUG`                               | Keep `false` outside local development.                                                                          |
+| Variable                                  | Purpose                                                                                                       |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | Optional. When set, ops alerts use Telegram. When empty, the same alerts go by email.                         |
+| `MAIL_MAILER` / `RESEND_API_KEY`          | Use `MAIL_MAILER=resend` and a Resend API key for real email (contact form + ops alerts).                     |
+| `CONTACT_MAIL_TO`                         | Inbox for contact form and email ops alerts (falls back to `MAIL_FROM_ADDRESS`).                              |
+| `WEBHOOK_REQUEST_RETENTION_DAYS`          | Captured webhook payloads older than this many days are deleted daily. `0` keeps them forever. Default `30`.  |
+| `APP_DEBUG`                               | Keep `false` outside local development.                                                                       |
 
 See `.env.example` and `docker/.env.example` for the full list.
 
