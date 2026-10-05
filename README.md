@@ -81,7 +81,7 @@ The repo includes a multi-service Compose stack (`app`, `worker`, `scheduler`, `
 
 | Variable                                  | Purpose                                                                                                          |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `REGISTRATION_ENABLED`                    | Default `false`. When `false`, `/register` returns 404 and Sign up links are hidden. Set `true` for local demos. |
+| `REGISTRATION_ENABLED`                    | Default `false`. The first account can always register. After that, `/register` is 404 unless this is `true`.    |
 | `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | Optional. When set, ops alerts use Telegram. When empty, the same alerts go by email.                            |
 | `MAIL_MAILER` / `RESEND_API_KEY`          | Use `MAIL_MAILER=resend` and a Resend API key for real email (contact form + ops alerts).                        |
 | `CONTACT_MAIL_TO`                         | Inbox for contact form and email ops alerts (falls back to `MAIL_FROM_ADDRESS`).                                 |
@@ -102,7 +102,7 @@ See `.env.example` and `docker/.env.example` for the full list.
 
 ## Security notes
 
-- Registration is **off by default** so strangers cannot create monitors that fire HTTP from your server.
+- Registration is **off by default** after the first account exists, so strangers cannot create monitors that fire HTTP from your server. The first user on a fresh install can always open `/register`.
 - Monitor URLs must be public `http`/`https`. Localhost and private/reserved IP literals (e.g. `127.0.0.1`, `10.x`, cloud metadata) are rejected. That protects the **DevPulse host**, not your customers' public APIs.
 - Projects and monitors are owned by a single user (policies). Another account cannot operate your monitors.
 - Passwords require at least 8 characters, mixed case, and a number. The register/reset forms show the rules up front.

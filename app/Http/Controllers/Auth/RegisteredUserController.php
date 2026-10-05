@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
+use App\Support\Registration;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -16,12 +17,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RegisteredUserController extends Controller
 {
+    public function __construct(public Registration $registration) {}
+
     /**
      * Display the registration view.
      */
     public function create(): Response
     {
-        $this->ensureRegistrationIsEnabled();
+        $this->ensureRegistrationIsOpen();
 
         return Inertia::render('auth/Register');
     }
@@ -33,7 +36,7 @@ class RegisteredUserController extends Controller
      */
     public function store(RegisterRequest $request): RedirectResponse
     {
-        $this->ensureRegistrationIsEnabled();
+        $this->ensureRegistrationIsOpen();
 
         $user = User::create([
             'name' => $request->name,
@@ -48,9 +51,9 @@ class RegisteredUserController extends Controller
         return redirect(route('dashboard', absolute: false));
     }
 
-    private function ensureRegistrationIsEnabled(): void
+    private function ensureRegistrationIsOpen(): void
     {
-        if (! config('app.registration_enabled')) {
+        if (! $this->registration->isOpen()) {
             throw new NotFoundHttpException;
         }
     }

@@ -2,11 +2,14 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\Registration;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
+    public function __construct(public Registration $registration) {}
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -44,7 +47,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
             ],
-            'canRegister' => (bool) config('app.registration_enabled'),
+            'canRegister' => $this->registration->isOpen(),
             'passwordRules' => [
                 'min' => 8,
                 'mixedCase' => true,
